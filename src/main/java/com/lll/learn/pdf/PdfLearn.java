@@ -9,10 +9,16 @@ import java.io.IOException;
  **/
 public class PdfLearn {
     public static void main(String[] args) throws IOException {
-        ReportBuilder reportBuilder = new ReportBuilder();
-        reportBuilder.initPdf("E:\\Users\\fgm\\Desktop\\pdf\\hello.pdf");
+        ReportBuilder reportBuilder = new GenoReportBuilder();
+        reportBuilder.initPdf("E:\\Users\\fgm\\Desktop\\pdf\\report.pdf");
 
-        reportBuilder.addIndex().addHello();
+        reportBuilder
+                .addIndex()
+                .addHello()
+                .addExaminee()
+                .addDetectionContent()
+                .addDirectory()
+        ;
 
         reportBuilder.build();
     }
