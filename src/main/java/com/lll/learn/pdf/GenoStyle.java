@@ -1,8 +1,10 @@
 package com.lll.learn.pdf;
 
+import com.itextpdf.kernel.colors.ColorConstants;
 import com.itextpdf.layout.Style;
 import com.itextpdf.layout.borders.Border;
 import com.itextpdf.layout.borders.SolidBorder;
+import com.itextpdf.layout.property.HorizontalAlignment;
 import com.itextpdf.layout.property.VerticalAlignment;
 
 /**
@@ -23,7 +25,6 @@ public class GenoStyle {
         Style style = new Style();
         style.setFontSize(16);
         style.setBold();
-        style.setMarginLeft(3);
         style.setFontColor(GenoColor.getThemeColor());
         return style;
     }
@@ -35,7 +36,7 @@ public class GenoStyle {
         return style;
     }
 
-    public static Style getThreeTitleStyle() {
+    public static Style getThirdTitleStyle() {
         Style style = new Style();
         style.setFontSize(12);
         style.setFontColor(GenoColor.getThemeColor());
@@ -64,13 +65,18 @@ public class GenoStyle {
         return style;
     }
 
-
-
     public static Style getDefaultCell() {
         Style style = new Style();
         style.setPadding(10);
         style.setBorder(Border.NO_BORDER);
         style.setVerticalAlignment(VerticalAlignment.MIDDLE);
+        return style;
+    }
+
+    public static Style getTableCell() {
+        Style style = new Style();
+        style.setVerticalAlignment(VerticalAlignment.MIDDLE);
+        style.setBorder(new SolidBorder(GenoColor.getThemeColor(), 1));
         return style;
     }
 
@@ -97,6 +103,12 @@ public class GenoStyle {
     public static Style getSignStyle() {
         Style style = new Style();
         style.setFontSize(11);
+        return style;
+    }
+
+    public static Style getTableHeader() {
+        Style style = new Style();
+        style.setBackgroundColor(GenoColor.getThemeColor()).setFontColor(ColorConstants.WHITE);
         return style;
     }
 }

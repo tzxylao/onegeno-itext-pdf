@@ -2,15 +2,17 @@ package com.lll.learn.pdf;
 
 import com.itextpdf.layout.element.Cell;
 import com.itextpdf.layout.element.Paragraph;
+import com.itextpdf.layout.element.Text;
 import com.itextpdf.layout.property.OverflowPropertyValue;
 import com.itextpdf.layout.property.Property;
+import com.itextpdf.layout.property.TextAlignment;
 
 /**
  * @author: laoliangliang
  * @description:
  * @create: 2020/5/20 8:34
  **/
-public class Component {
+public class GenoComponent {
     public static Paragraph getCatelogDottedLine(int type) {
         Paragraph element;
         if (type == 1) {
@@ -24,6 +26,10 @@ public class Component {
 
     public static Cell getDefaultCell() {
         return new Cell().addStyle(GenoStyle.getDefaultCell());
+    }
+
+    public static Cell getTableCell() {
+        return new Cell().setTextAlignment(TextAlignment.CENTER).addStyle(GenoStyle.getTableCell());
     }
 
     public static Cell getDefaultCell(int rowspan, int colspan) {
@@ -45,4 +51,21 @@ public class Component {
     public static Paragraph getSignParagraph(String text) {
         return new Paragraph(text).addStyle(GenoStyle.getSignStyle());
     }
+
+    public static Text getSecondTitle(String context){
+        return new Text(context).addStyle(GenoStyle.getSecondTitleStyle());
+    }
+
+    public static Text getThirdTitle(String context){
+        return new Text(context).addStyle(GenoStyle.getThirdTitleStyle());
+    }
+
+    public static Paragraph getHeaderLineText(String context){
+        return new Paragraph(context).setTextAlignment(TextAlignment.CENTER).setFontSize(12).setMarginTop(-20);
+    }
+
+    public static Paragraph getTitleParagraph(Text context){
+        return new Paragraph(context).setMargin(-2);
+    }
+
 }

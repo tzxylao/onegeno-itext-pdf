@@ -17,6 +17,10 @@ public class GenoColor {
         return new DeviceRgb(102, 170, 255);
     }
 
+    public static Color getGreenColor() {
+        return new DeviceRgb(29,190,190);
+    }
+
     public static Color getOrangeColor() {
         return new DeviceRgb(247, 181, 45);
     }

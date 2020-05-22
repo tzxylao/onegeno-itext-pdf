@@ -10,12 +10,19 @@ import com.itextpdf.kernel.geom.PageSize;
 import com.itextpdf.kernel.geom.Rectangle;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfPage;
+import com.itextpdf.kernel.pdf.PdfReader;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
 import com.itextpdf.layout.Document;
+import com.itextpdf.layout.element.Paragraph;
+import com.itextpdf.layout.property.TextAlignment;
+import com.itextpdf.layout.property.VerticalAlignment;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author: laoliangliang
@@ -28,28 +35,34 @@ public abstract class ReportBuilder {
     protected PdfDocument pdf;
     protected Document doc;
     protected PdfFont font;
+    protected String outPath;
+
+    protected Map<Integer, String> headerLineTextMap = new HashMap<>();
 
     protected void initPdf(String outPath) throws IOException {
+        this.outPath = outPath;
         writer = new PdfWriter(new File(outPath));
         pdf = new PdfDocument(writer);
-        pdf.addEventHandler(PdfDocumentEvent.END_PAGE, new MyEventHandler());
+        pdf.addEventHandler(PdfDocumentEvent.END_PAGE, new EndPageEventHandler(this));
+        pdf.addEventHandler(PdfDocumentEvent.START_PAGE, new StartPageEventHandler(this));
         pdf.setDefaultPageSize(PageSize.A4);
         pdf.getDefaultPageSize().applyMargins(0, 0, 0, 0, true);
 
 //        PdfFont font = PdfFontFactory.createFont("STSong-Light", "UniGB-UCS2-H", true);
         font = PdfFontFactory.createFont(ReportBuilder.class.getClassLoader().getResource("font/SourceHanSansCN-Regular.ttf").getPath(), PdfEncodings.IDENTITY_H, true);
         doc = new Document(pdf);
-        doc.setMargins(40, 60, 40, 60);
+        doc.setMargins(50, 60, 60, 60);
         doc.setFont(font);
         doc.setFontSize(10f);
     }
 
-    /**
-     * 添加正文
-     */
-    public abstract void addContext();
+    protected class EndPageEventHandler implements IEventHandler {
 
-    protected class MyEventHandler implements IEventHandler {
+        private ReportBuilder builder;
+
+        public EndPageEventHandler(ReportBuilder reportBuilder) {
+            this.builder = reportBuilder;
+        }
 
         @Override
         public void handleEvent(Event event) {
@@ -58,6 +71,7 @@ public abstract class ReportBuilder {
             PdfPage page = docEvent.getPage();
             int pageNumber = pdfDoc.getPageNumber(page);
             Rectangle pageSize = page.getPageSize();
+
             PdfCanvas pdfCanvas = new PdfCanvas(page.newContentStreamBefore(), page.getResources(), pdfDoc);
 
             //Add header and footer
@@ -68,6 +82,46 @@ public abstract class ReportBuilder {
                     .endText();
 
             pdfCanvas.release();
+
+//            if (pageNumber >= 7 && pageNumber != 9) {
+//                String text = headerLineTextMap.get(pageNumber);
+//                if (text != null) {
+//                    // 头条，进度条
+//                    Painting painting = new Painting(pdf, builder);
+//                    painting.drawHeader();
+//                    painting.close();
+//                }
+//            }
+        }
+    }
+
+    protected class StartPageEventHandler implements IEventHandler {
+
+        private ReportBuilder builder;
+
+        public StartPageEventHandler(ReportBuilder reportBuilder) {
+            this.builder = reportBuilder;
+        }
+
+        @Override
+        public void handleEvent(Event event) {
+            PdfDocumentEvent docEvent = (PdfDocumentEvent) event;
+            PdfDocument pdfDoc = docEvent.getDocument();
+            PdfPage page = docEvent.getPage();
+            int pageNumber = pdfDoc.getPageNumber(page);
+            Rectangle pageSize = page.getPageSize();
+
+//            PdfCanvas pdfCanvas = new PdfCanvas(page.newContentStreamAfter(), page.getResources(), pdfDoc);
+
+//            if (pageNumber >= 7 && pageNumber != 9) {
+//                String text = headerLineTextMap.get(pageNumber);
+//                if (text != null) {
+                    // 头条，进度条
+//                    Painting painting = new Painting(pdf, pdfCanvas,builder);
+//                    painting.drawHeader();
+//                    painting.close();
+//                }
+//            }
         }
     }
 
@@ -110,4 +164,9 @@ public abstract class ReportBuilder {
      * 检测结果概况
      */
     public abstract GenoReportBuilder addResultSummary();
+
+    /**
+     * 添加正文
+     */
+    public abstract void addContext();
 }
