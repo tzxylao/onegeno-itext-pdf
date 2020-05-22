@@ -25,8 +25,8 @@ import java.net.URL;
 public class GenoReportBuilder extends ReportBuilder {
 
     @Override
-    public void initPdf(String filePath) throws IOException {
-        super.initPdf(filePath);
+    public void initPdf(String outPath) throws IOException {
+        super.initPdf(outPath);
     }
 
     @Override
@@ -324,6 +324,7 @@ public class GenoReportBuilder extends ReportBuilder {
 
         Painting painting = new Painting(pdf);
         painting.drawHeader();
+        painting.drawSegment();
         painting.close();
     }
 

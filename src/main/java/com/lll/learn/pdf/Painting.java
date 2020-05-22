@@ -36,11 +36,11 @@ public class Painting {
                 .lineTo(pageSize.getWidth() - 60, y).stroke();
     }
 
-    public void drawSocre() {
+    public void drawSegment() {
         pdfCanvas.setStrokeColor(GenoColor.getRedColor());
         pdfCanvas.
-                saveState().moveTo(pageSize.getWidth() / 2 - 50, -200)
-                .rectangle(pageSize.getWidth() / 2 - 50, -200, 100, 5)
+                saveState().moveTo(pageSize.getWidth() / 2 - 50, -205)
+                .lineTo(pageSize.getWidth() / 2 - 50, -210)
                 .stroke().restoreState();
     }
 

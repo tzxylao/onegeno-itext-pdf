@@ -29,8 +29,8 @@ public abstract class ReportBuilder {
     protected Document doc;
     protected PdfFont font;
 
-    protected void initPdf(String filePath) throws IOException {
-        writer = new PdfWriter(new File(filePath));
+    protected void initPdf(String outPath) throws IOException {
+        writer = new PdfWriter(new File(outPath));
         pdf = new PdfDocument(writer);
         pdf.addEventHandler(PdfDocumentEvent.END_PAGE, new MyEventHandler());
         pdf.setDefaultPageSize(PageSize.A4);
