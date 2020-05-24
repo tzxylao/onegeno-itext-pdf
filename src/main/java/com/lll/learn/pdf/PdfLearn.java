@@ -14,7 +14,7 @@ public class PdfLearn {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         ReportBuilder reportBuilder = new GenoReportBuilder();
-        reportBuilder.initPdf("E:\\Users\\fgm\\Desktop\\pdf\\report.pdf");
+        reportBuilder.initPdf("/Users/laoliangliang/Desktop/report.pdf");
 
         reportBuilder
                 .addIndex()

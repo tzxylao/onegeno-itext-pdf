@@ -10,16 +10,11 @@ import com.itextpdf.kernel.geom.PageSize;
 import com.itextpdf.kernel.geom.Rectangle;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfPage;
-import com.itextpdf.kernel.pdf.PdfReader;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
 import com.itextpdf.layout.Document;
-import com.itextpdf.layout.element.Paragraph;
-import com.itextpdf.layout.property.TextAlignment;
-import com.itextpdf.layout.property.VerticalAlignment;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -39,7 +34,7 @@ public abstract class ReportBuilder {
 
     protected Map<Integer, String> headerLineTextMap = new HashMap<>();
 
-    protected void initPdf(String outPath) throws IOException {
+    public void initPdf(String outPath) throws IOException {
         this.outPath = outPath;
         writer = new PdfWriter(new File(outPath));
         pdf = new PdfDocument(writer);
@@ -128,17 +123,17 @@ public abstract class ReportBuilder {
     /**
      * 添加首页图片
      */
-    abstract ReportBuilder addIndex();
+    public abstract ReportBuilder addIndex();
 
     /**
      * say hello
      */
-    abstract ReportBuilder addHello();
+    public abstract ReportBuilder addHello();
 
     /**
      * 添加受检人信息
      */
-    abstract ReportBuilder addExaminee();
+    public abstract ReportBuilder addExaminee();
 
     public void build() {
         try {

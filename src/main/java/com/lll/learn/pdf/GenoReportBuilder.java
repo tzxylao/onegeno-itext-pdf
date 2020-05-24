@@ -3,18 +3,15 @@ package com.lll.learn.pdf;
 import com.itextpdf.io.image.ImageDataFactory;
 import com.itextpdf.kernel.colors.Color;
 import com.itextpdf.kernel.colors.ColorConstants;
-import com.itextpdf.kernel.events.Event;
-import com.itextpdf.kernel.events.IEventHandler;
 import com.itextpdf.kernel.events.PdfDocumentEvent;
 import com.itextpdf.kernel.geom.Rectangle;
-import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfPage;
-import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Canvas;
 import com.itextpdf.layout.Style;
 import com.itextpdf.layout.borders.SolidBorder;
 import com.itextpdf.layout.element.*;
 import com.itextpdf.layout.property.*;
+import com.lll.learn.pdf.event.HeaderTextEvent;
 
 import java.io.IOException;
 import java.net.URL;
@@ -90,7 +87,7 @@ public class GenoReportBuilder extends ReportBuilder {
     }
 
     @Override
-    ReportBuilder addExaminee() {
+    public ReportBuilder addExaminee() {
         doc.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
         Div div1 = new Div();
         Image iconImage27 = new Image(ImageDataFactory.create(GenoReportBuilder.class.getClassLoader().getResource("image/icon-27.png")));
@@ -285,7 +282,16 @@ public class GenoReportBuilder extends ReportBuilder {
 
     @Override
     public void addContext() {
+        float score = 1.9f;
+        String title = "结直肠癌";
+        pdf.addEventHandler(PdfDocumentEvent.START_PAGE, new HeaderTextEvent(title));
+
         doc.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
+
+        // 头条，进度条
+        Painting painting = new Painting(pdf);
+        painting.drawSegment(score);
+        painting.close();
 
         // 标题
         Paragraph header = GenoComponent.getHeaderLineText("结直肠癌");
@@ -308,7 +314,6 @@ public class GenoReportBuilder extends ReportBuilder {
         attentionStyle.setBorderRadius(new BorderRadius(5));
         attentionStyle.setFontColor(ColorConstants.WHITE);
 
-        float score = 1.9f;
         Text level1 = new Text("低").addStyle(style);
         Text level2 = new Text("稍低").addStyle(style);
         Text level3 = new Text("正常").addStyle(style);
@@ -353,7 +358,7 @@ public class GenoReportBuilder extends ReportBuilder {
         p2.add(new Tab());
         p2.addTabStops(new TabStop(20, TabAlignment.LEFT));
         p2.add("您的基因风险指数为");
-        p2.add(new Text(score+"").setFontColor(color));
+        p2.add(new Text(score + "").setFontColor(color));
         switch (index) {
             case 0:
             case 1:
@@ -398,13 +403,7 @@ public class GenoReportBuilder extends ReportBuilder {
                 "肺癌发病率在男性恶性肿瘤中已居⾸位");
         doc.add(p3);
 
-        // 头条，进度条
-        Painting painting = new Painting(pdf);
-        painting.drawHeader();
-        painting.drawSegment(score);
-        painting.close();
 
-        String title = "结直肠癌";
         // 新的一页，症状，健康建议
         doc.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
         doc.add(GenoComponent.getTitleParagraph(GenoComponent.getSecondTitle("症状")));
@@ -443,6 +442,11 @@ public class GenoReportBuilder extends ReportBuilder {
                 "③避免其它病原体的感染：沙眼⾐原体、⼈巨细胞病毒、⽀原体等病原体的感染在HPV感染导致宫颈\n" +
                 "癌的发病过程中有协同作⽤，要洁⾝⾃好、注意卫⽣，积极避免这些病原体的感染。\n" +
                 "3.改变不良⽣活⽅式\n" +
+                "①选择安全可靠的避孕措施：⼝服避孕药也会增加宫颈癌的患病⻛险，应尽量选择安全套等⾮药物避\n" +
+                "①选择安全可靠的避孕措施：⼝服避孕药也会增加宫颈癌的患病⻛险，应尽量选择安全套等⾮药物避\n" +
+                "①选择安全可靠的避孕措施：⼝服避孕药也会增加宫颈癌的患病⻛险，应尽量选择安全套等⾮药物避\n" +
+                "①选择安全可靠的避孕措施：⼝服避孕药也会增加宫颈癌的患病⻛险，应尽量选择安全套等⾮药物避\n" +
+                "①选择安全可靠的避孕措施：⼝服避孕药也会增加宫颈癌的患病⻛险，应尽量选择安全套等⾮药物避\n" +
                 "①选择安全可靠的避孕措施：⼝服避孕药也会增加宫颈癌的患病⻛险，应尽量选择安全套等⾮药物避\n" +
                 "孕措施，还能预防HPV感染。\n" +
                 "②保持有节律的性⽣活：性⽣活紊乱、过早性⽣活（＜16岁）都会增加宫颈癌患病⻛险。"));
