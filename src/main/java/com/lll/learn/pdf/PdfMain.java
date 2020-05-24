@@ -9,7 +9,7 @@ import java.io.IOException;
  * @description:
  * @create: 2020/5/19 13:35
  **/
-public class PdfLearn {
+public class PdfMain {
     public static void main(String[] args) throws IOException {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
