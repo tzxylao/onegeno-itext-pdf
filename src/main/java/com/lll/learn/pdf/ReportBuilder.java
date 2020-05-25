@@ -13,11 +13,10 @@ import com.itextpdf.kernel.pdf.PdfPage;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
 import com.itextpdf.layout.Document;
+import com.lll.learn.data.PrintReportBean;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author: laoliangliang
@@ -31,8 +30,11 @@ public abstract class ReportBuilder {
     protected Document doc;
     protected PdfFont font;
     protected String outPath;
+    protected PrintReportBean reportBean;
 
-    protected Map<Integer, String> headerLineTextMap = new HashMap<>();
+    public void setPrintReportBean(PrintReportBean printReportBean) {
+        this.reportBean = printReportBean;
+    }
 
     public void initPdf(String outPath) throws IOException {
         this.outPath = outPath;

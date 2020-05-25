@@ -4,7 +4,6 @@ import com.itextpdf.kernel.colors.ColorConstants;
 import com.itextpdf.layout.Style;
 import com.itextpdf.layout.borders.Border;
 import com.itextpdf.layout.borders.SolidBorder;
-import com.itextpdf.layout.property.HorizontalAlignment;
 import com.itextpdf.layout.property.VerticalAlignment;
 
 /**
@@ -55,6 +54,7 @@ public class GenoStyle {
         style.setHeight(18);
         style.setWidth(15);
         style.setMarginBottom(-2);
+        style.setMarginRight(2);
         return style;
     }
 
