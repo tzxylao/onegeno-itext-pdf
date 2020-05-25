@@ -24,6 +24,8 @@ public class PdfMain {
                 .addDirectory()
                 .addResultSummary()
                 .addContext()
+                .addThanks()
+                .addBackCover()
         ;
 
         reportBuilder.build();

@@ -2,17 +2,22 @@ package com.lll.learn.pdf;
 
 import com.itextpdf.io.font.PdfEncodings;
 import com.itextpdf.io.font.constants.StandardFonts;
+import com.itextpdf.io.image.ImageDataFactory;
 import com.itextpdf.kernel.colors.Color;
 import com.itextpdf.kernel.colors.ColorConstants;
 import com.itextpdf.kernel.font.PdfFont;
 import com.itextpdf.kernel.font.PdfFontFactory;
 import com.itextpdf.kernel.geom.PageSize;
+import com.itextpdf.kernel.geom.Rectangle;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfPage;
 import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
+import com.itextpdf.layout.Canvas;
+import com.itextpdf.layout.element.Image;
 import lombok.Data;
 
 import java.io.IOException;
+import java.net.URL;
 
 /**
  * @author: laoliangliang
@@ -127,5 +132,22 @@ public class Painting {
                 .moveText(pageSize.getWidth() / 2 - text.length() * 12 / 2, yOffset - 45);
         pdfCanvas.showText(text);
         pdfCanvas.endText();
+    }
+
+    public void drawHello(String imagePath) {
+        URL resource = Painting.class.getClassLoader().getResource(imagePath);
+        Image backImage = new Image(ImageDataFactory.create(resource));
+        PdfPage page = pdf.addNewPage();
+        Rectangle pageSize = page.getPageSize();
+        int leftDist = 0;
+        Rectangle rectangle = new Rectangle(
+                pageSize.getX() + leftDist,
+                pageSize.getTop(),
+                pageSize.getWidth() - leftDist * 2,
+                40);
+
+        Canvas canvas = new Canvas(page, rectangle);
+        canvas.add(backImage).flush();
+        canvas.close();
     }
 }

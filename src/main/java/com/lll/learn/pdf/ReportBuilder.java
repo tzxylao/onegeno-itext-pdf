@@ -48,8 +48,9 @@ public abstract class ReportBuilder {
         doc = new Document(pdf);
         doc.setMargins(50, 60, 60, 60);
         doc.setFont(font);
-        doc.setFontSize(10f);
+        doc.setFontSize(10.5f);
     }
+
 
     protected class EndPageEventHandler implements IEventHandler {
 
@@ -163,5 +164,15 @@ public abstract class ReportBuilder {
     /**
      * 添加正文
      */
-    public abstract void addContext();
+    public abstract GenoReportBuilder addContext();
+
+    /**
+     * 结束语
+     */
+    public abstract GenoReportBuilder addThanks();
+
+    /**
+     * 封底
+     */
+    public abstract GenoReportBuilder addBackCover();
 }

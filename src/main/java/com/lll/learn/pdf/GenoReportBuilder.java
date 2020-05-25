@@ -3,6 +3,7 @@ package com.lll.learn.pdf;
 import com.itextpdf.io.image.ImageDataFactory;
 import com.itextpdf.kernel.colors.Color;
 import com.itextpdf.kernel.colors.ColorConstants;
+import com.itextpdf.kernel.colors.DeviceRgb;
 import com.itextpdf.kernel.events.PdfDocumentEvent;
 import com.itextpdf.kernel.geom.Rectangle;
 import com.itextpdf.kernel.pdf.PdfPage;
@@ -50,7 +51,7 @@ public class GenoReportBuilder extends ReportBuilder {
         Paragraph p1 = new Paragraph();
         p1.setHorizontalAlignment(HorizontalAlignment.CENTER);
         p1.setMaxWidth(UnitValue.createPercentValue(75));
-        p1.setMarginTop(200f);
+        p1.setMarginTop(180f);
         p1.setCharacterSpacing(0.4f);
         Style large = new Style();
         large.setFontSize(22);
@@ -67,20 +68,11 @@ public class GenoReportBuilder extends ReportBuilder {
                 "\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0壹基因衷心祝愿您身体健康、享受品质生活！"));
         div.add(p1);
 
-        URL resource = GenoReportBuilder.class.getClassLoader().getResource("image/纸质报告-03.png");
-        Image backImage = new Image(ImageDataFactory.create(resource));
-        PdfPage page = pdf.addNewPage();
-        Rectangle pageSize = page.getPageSize();
-        int leftDist = 0;
-        Rectangle rectangle = new Rectangle(
-                pageSize.getX() + leftDist,
-                pageSize.getTop(),
-                pageSize.getWidth() - leftDist * 2,
-                40);
 
-        Canvas canvas = new Canvas(page, rectangle);
-        canvas.add(backImage).flush();
-        canvas.close();
+
+        Painting painting = new Painting(pdf);
+        painting.drawHello("image/纸质报告-03.png");
+        painting.close();
 
         doc.add(div);
         return this;
@@ -281,10 +273,11 @@ public class GenoReportBuilder extends ReportBuilder {
     }
 
     @Override
-    public void addContext() {
+    public GenoReportBuilder addContext() {
         float score = 1.9f;
         String title = "结直肠癌";
-        pdf.addEventHandler(PdfDocumentEvent.START_PAGE, new HeaderTextEvent(title));
+        HeaderTextEvent headerTextEvent = new HeaderTextEvent(title);
+        pdf.addEventHandler(PdfDocumentEvent.START_PAGE, headerTextEvent);
 
         doc.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
 
@@ -292,10 +285,6 @@ public class GenoReportBuilder extends ReportBuilder {
         Painting painting = new Painting(pdf);
         painting.drawSegment(score);
         painting.close();
-
-        // 标题
-        Paragraph header = GenoComponent.getHeaderLineText("结直肠癌");
-        doc.add(header);
 
         Paragraph p1 = new Paragraph();
         p1.add(new Text("结直肠癌\n").addStyle(GenoStyle.getTitleStyle()));
@@ -405,7 +394,7 @@ public class GenoReportBuilder extends ReportBuilder {
 
 
         // 新的一页，症状，健康建议
-        doc.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
+//        doc.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
         doc.add(GenoComponent.getTitleParagraph(GenoComponent.getSecondTitle("症状")));
         Paragraph p4 = new Paragraph();
         p4.add("1.阴道流⾎：是宫颈癌的主要症状。出⾎量根据病灶⼤⼩、侵及间质内⾎管情况⽽定，若侵袭⼤⾎管\n" +
@@ -443,15 +432,103 @@ public class GenoReportBuilder extends ReportBuilder {
                 "癌的发病过程中有协同作⽤，要洁⾝⾃好、注意卫⽣，积极避免这些病原体的感染。\n" +
                 "3.改变不良⽣活⽅式\n" +
                 "①选择安全可靠的避孕措施：⼝服避孕药也会增加宫颈癌的患病⻛险，应尽量选择安全套等⾮药物避\n" +
-                "①选择安全可靠的避孕措施：⼝服避孕药也会增加宫颈癌的患病⻛险，应尽量选择安全套等⾮药物避\n" +
-                "①选择安全可靠的避孕措施：⼝服避孕药也会增加宫颈癌的患病⻛险，应尽量选择安全套等⾮药物避\n" +
-                "①选择安全可靠的避孕措施：⼝服避孕药也会增加宫颈癌的患病⻛险，应尽量选择安全套等⾮药物避\n" +
-                "①选择安全可靠的避孕措施：⼝服避孕药也会增加宫颈癌的患病⻛险，应尽量选择安全套等⾮药物避\n" +
-                "①选择安全可靠的避孕措施：⼝服避孕药也会增加宫颈癌的患病⻛险，应尽量选择安全套等⾮药物避\n" +
                 "孕措施，还能预防HPV感染。\n" +
-                "②保持有节律的性⽣活：性⽣活紊乱、过早性⽣活（＜16岁）都会增加宫颈癌患病⻛险。"));
+                "②保持有节律的性⽣活：性⽣活紊乱、过早性⽣活（＜16岁）都会增加宫颈癌患病⻛险。\n" +
+                "4.养成健康饮⻝习惯\n" +
+                "①少吃腌制、烟熏、烧烤及⾟辣⻝品：这些⻝品含有的亚硝酸盐、多环芳烃类致癌物质，可增加宫颈\n" +
+                "癌患病⻛险，另外，⼤量⻝⽤⾟辣⻝品也可增加患癌的⻛险。\n" +
+                "②保证每⽇蔬菜和⽔果的摄⼊，限制⾼脂、⾼糖饮⻝，均衡膳⻝：特别是脂肪摄⼊量较⾼的⼥性患病\n" +
+                "⻛险较⾼。建议每⽇⾄少⻝⽤300~500g蔬菜及200~350g⽔果，健康⼈群每⽇平均膳⻝⽐例应为：⾕\n" +
+                "薯类30%、蔬菜35%、⽔果20%、动物性⻝品加⼤⾖15%。\n" +
+                "5.规避外界环境⻛险\n" +
+                "避免致癌物接触：铀、镭及其衍化物等放射性物质，砷、铬、镍等重⾦属，煤焦油、⽯棉、福尔⻢林\n" +
+                "等化⼯原料具有较强致癌作⽤。要避免接触此类化学物质，相关⾏业⼯作者应按照职业防护标准做好\n" +
+                "防护。"));
 
+        // 基因解读
+        doc.add(GenoComponent.getTitleParagraph(new Text("基因解读").addStyle(GenoStyle.getSecondTitleStyle())));
+        doc.add(new Paragraph("研究表明，EXOC1、RAB51B、ZNRD1等基因的多态性与宫颈癌的发病⻛险密切相关。\n" +
+                "EXOC1基因编码的蛋⽩属于胞泌⼩泡蛋⽩复合体的组分之⼀，其功能主要负责将胞泌⼩泡运输并定位\n" +
+                "到细胞膜的特定部位。当该基因发⽣突变时会减弱⼈体对感染病原微⽣物的免疫抵抗能⼒，导致感染\n" +
+                "⼈乳头状瘤病毒（HPV）的机率增加，进⽽增加宫颈癌的发病⻛险。研究表明，EXOC1基因的多态性\n" +
+                "和宫颈癌的发病⻛险密切相关，该基因254173位点的基因型为TC以及TT的⼈群患宫颈癌的⻛险要⾼\n" +
+                "于基因型为CC的⼈群。\n" +
+                "RAD51B基因编码的蛋⽩属于DNA损伤修复蛋⽩RAD51蛋⽩超家族，该蛋⽩是在DNA损伤修复过程中\n" +
+                "⾮常重要的成员之⼀，能够和该家族另外⼀个成员RAD51C形成稳定的异源⼆聚体共同参与DNA修复\n" +
+                "过程。研究表明，RAD51B基因的多态性和宫颈癌的发病⻛险密切相关，该基因183885位点的基因型\n" +
+                "为AG以及GG的⼈群患宫颈癌的⻛险要低于基因型为AA的⼈群。\n" +
+                "ZNRD1基因编码的产物属于ZNRD1基因的反义RNA分⼦，该RNA分⼦可以和ZNRD1基因编码的信使R\n" +
+                "NA结合从⽽调节ZNRD1基因的表达⽔平。ZNRD1蛋⽩属于RNA聚合酶的组成成分之⼀，可以调控细\n" +
+                "胞的增殖。研究表明，ZNRD1基因的多态性和宫颈癌的发病⻛险密切相关，该基因126819位点的基\n" +
+                "因型为AG以及AA的⼈群患宫颈癌的⻛险要低于基因型为GG的⼈群。"));
 
+        doc.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
+        doc.add(GenoComponent.getTitleParagraph(new Text("参考文献（部分）").addStyle(GenoStyle.getSecondTitleStyle())));
+        doc.add(new Paragraph(new Text("[1]Jin?T,?Wu?X,?Yang?H.?Association?of?the?miR-17-5p?variants?with?susceptibility?to?cervical?cancer\n" +
+                "in?a?Chinese?population.??Oncotarget.??2016?7(47).\n" +
+                "[2]Miura?K,?Mishima?H,?Kinoshita?A.?Genome-wide?association?study?of?HPV-associated?cervical?ca\n" +
+                "ncer?in?Japanese?women.??Journal?of?Medical?Virology.??2014?86(7).\n" +
+                "[3]Shi?Y,?Li?L,?Hu?Z.?A?genome-wide?association?study?identifies?two?new?cervical?cancer?susceptibi\n" +
+                "lity?loci?at?4q12?and?17q12.??Nature?Genetics.??2013?45(8).\n" +
+                "[4]Jia?M,?Han?J,?Hang?D.?HLA-DP?is?the?cervical?cancer?susceptibility?loci?among?women?infected?b\n" +
+                "y?high-risk?human?papillomavirus:?potential?implication?for?triage?of?human?papillomavirus-positi\n" +
+                "ve?women.??Tumor?Biology.??2015?1-7.\n" +
+                "[5]Han?J,?Zhou?W,?Jia?M.?Expression?quantitative?trait?loci?in?long?non-coding?RNA?PAX8-AS1?are?as\n" +
+                "sociated?with?decreased?risk?of?cervical?cancer.??Molecular?Genetics?and?Genomics.??2016?1-6.\n" +
+                "[6]Chen?D,?Enroth?S,?Liu?H.?Pooled?analysis?of?genome-wide?association?studies?of?cervical?intraep\n" +
+                "ithelial?neoplasia?3?(CIN3)?identifies?a?new?susceptibility?locu.?Oncotarget.?2016.\n" +
+                "[7]Guo?L,?Wen?J,?Han?J.?Expression?quantitative?trait?loci?in?long?non-coding?RNA?ZNRD1-AS1?influ\n" +
+                "ence?cervical?cancer?development.??American?journal?of?cancer?research.??2015?5(7).\n" +
+                "[8]Hang?D,?Zhou?W,?Jia?M.?Genetic?variants?within?microRNA‐binding?site?of?RAD51B?are?associate\n" +
+                "d?with?risk?of?cervical?cancer?in?Chinese?women.??Cancer?Medicine.??2016?5(9).\n" +
+                "[9]Xie?B,?Zhang?Z,?Wang?H.?Genetic?polymorphisms?in?MMP?2,?3,?7,?and?9?genes?and?the?susceptibili\n" +
+                "ty?a").addStyle(new Style().setPaddings(-1,0,-1,0).setCharacterSpacing(1))).setFontSize(9f).setFontColor(new DeviceRgb(85,85,85)));
+
+        // 移除监听器
+        pdf.removeEventHandler(PdfDocumentEvent.START_PAGE, headerTextEvent);
+
+        return this;
+    }
+
+    @Override
+    public GenoReportBuilder addThanks() {
+        doc.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
+
+        Paragraph p1 = new Paragraph();
+        p1.setHorizontalAlignment(HorizontalAlignment.CENTER);
+        p1.setMaxWidth(UnitValue.createPercentValue(75));
+        p1.setMarginTop(200f);
+        p1.setCharacterSpacing(0.4f);
+        p1.add(new Text("\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0再次感谢您选用壹基因提供的基因检测服务。\n" +
+                "\n" +
+                "\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0疾病的发生受到先天和后天两个因素的共同影响，某疾病先天遗传风险低并不代表患病概率是零，如果后天生活习惯很差，生存环境不好，都会提升疾病的发生风险，促进疾病的最终发生；做基因检测的目的，不是去忽视低风险的疾病，而是要找出高风险疾病进行重点预防，采取措施进行针对性干预，以便阻断或者延缓疾病的发生。\n" +
+                "\n" +
+                "\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0您可以通过我们提供的健康建议开展健康管理，对风险较高项目积极预防，如改变饮食习惯，定期进行针对性的临床体检等。若您携带某种疾病易感基因型，该基因型很可能也存在于您亲属的基因中并遗传给他们的后代。因此，壹基因建议您的亲属也针对这些高风险项目进行检测，以了解自身健康风险，及早采取干预措施，拥有健康品质生活。\n" +
+                "\n" +
+                "\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0如果您对我们检测服务和体验有任何意见或建议，敬请拨打我们的健康热线400-163-5588，或者手机扫描下部二维码，联系您的专属健康顾问。"));
+        doc.add(p1);
+        URL resource = Painting.class.getClassLoader().getResource("image/结束语.png");
+        Image backImage = new Image(ImageDataFactory.create(resource));
+        int pageNum = pdf.getNumberOfPages();
+        backImage.setFixedPosition(pageNum, 0, 0, UnitValue.createPercentValue(125));
+        backImage.scale(1, 1.05f);
+        doc.add(backImage);
+
+        return this;
+    }
+
+    @Override
+    public GenoReportBuilder addBackCover() {
+        doc.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
+        doc.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
+
+        Image backCoverImage = new Image(ImageDataFactory.create(GenoReportBuilder.class.getClassLoader().getResource("image/封底-02.png")));
+        backCoverImage.setWidth(UnitValue.createPercentValue(100));
+        backCoverImage.scale(1.3f, 1.3f);
+        backCoverImage.setMarginLeft(-70);
+        backCoverImage.setMarginTop(-80);
+        doc.add(backCoverImage);
+        return this;
     }
 
 }
