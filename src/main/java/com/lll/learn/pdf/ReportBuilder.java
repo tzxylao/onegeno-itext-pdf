@@ -1,5 +1,6 @@
 package com.lll.learn.pdf;
 
+import com.itextpdf.html2pdf.ConverterProperties;
 import com.itextpdf.io.font.PdfEncodings;
 import com.itextpdf.kernel.events.Event;
 import com.itextpdf.kernel.events.IEventHandler;
@@ -13,6 +14,8 @@ import com.itextpdf.kernel.pdf.PdfPage;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
 import com.itextpdf.layout.Document;
+import com.itextpdf.layout.font.FontProvider;
+import com.itextpdf.layout.font.FontSet;
 import com.lll.learn.data.PrintReportBean;
 
 import java.io.File;
@@ -31,6 +34,7 @@ public abstract class ReportBuilder {
     protected PdfFont font;
     protected String outPath;
     protected PrintReportBean reportBean;
+    protected ConverterProperties proper;
 
     public void setPrintReportBean(PrintReportBean printReportBean) {
         this.reportBean = printReportBean;
@@ -51,6 +55,13 @@ public abstract class ReportBuilder {
         doc.setMargins(50, 60, 60, 60);
         doc.setFont(font);
         doc.setFontSize(10.5f);
+
+        proper = new ConverterProperties();
+        //字体设置，解决中文不显示问题
+        FontSet fontSet = new FontSet();
+        fontSet.addFont(GenoReportBuilder.class.getClassLoader().getResource("font/SourceHanSansCN-Regular.ttf").getPath(), PdfEncodings.IDENTITY_H);
+        FontProvider fontProvider = new FontProvider(fontSet);
+        proper.setFontProvider(fontProvider);
     }
 
 

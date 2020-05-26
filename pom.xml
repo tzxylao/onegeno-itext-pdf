@@ -11,7 +11,7 @@
     <groupId>com.lll.itext</groupId>
     <artifactId>pdf</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>learn</name>
+    <name>pdf</name>
     <description>Demo project for Spring Boot</description>
 
     <properties>
@@ -83,6 +83,14 @@
             <artifactId>slf4j-log4j12</artifactId>
             <version>1.7.18</version>
         </dependency>
+
+        <!--itext7 html转pdf用到的包-->
+        <dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>html2pdf</artifactId>
+            <version>3.0.0</version>
+        </dependency>
+
 
         <!-- tool -->
         <dependency>

@@ -199,7 +199,6 @@ public class ReportBean {
              * locked : true
              * direction : both
              */
-            private String categoryCode;
             private String code;
             private String name;
             private String icon;
@@ -239,7 +238,7 @@ public class ReportBean {
         private String level;
         private String label;
         private String description;
-        private Double score;
+        private float score;
         private Double tagScore;
         private boolean recommend;
         private Boolean locked;

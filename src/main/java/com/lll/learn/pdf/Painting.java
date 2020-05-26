@@ -122,8 +122,6 @@ public class Painting {
     }
 
     public void close() {
-        pdfCanvas.closePath();
-        pdfCanvas.closePathFillStroke();
         pdfCanvas.release();
     }
 
@@ -153,7 +151,7 @@ public class Painting {
         canvas.close();
     }
 
-    public void drawWss(int level, ReportBean.CategoriesBean.ItemsBean itemsBean) {
+    public void drawWss(int level, ReportBean.ItemsBean itemsBean) {
         float yOffset = pageSize.getTop() + 20;
         // 画线条
         pdfCanvas.saveState();
