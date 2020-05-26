@@ -13,6 +13,7 @@ import com.itextpdf.layout.element.*;
 import com.itextpdf.layout.property.*;
 import com.lll.learn.data.ReportBean;
 import com.lll.learn.pdf.event.HeaderTextEvent;
+import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.net.URL;
@@ -319,7 +320,7 @@ public class GenoReportBuilder extends ReportBuilder {
     @Override
     public GenoReportBuilder addContext() {
         java.util.List<ReportBean.ItemsBean> gaoLevel = new ArrayList<>();
-        java.util.List<ReportBean.ItemsBean> normalLecel = new ArrayList<>();
+        java.util.List<ReportBean.CategoriesBean> normalLecel = new ArrayList<>();
         java.util.List<ReportBean.CategoriesBean> categories = reportBean.getCategories();
         for (ReportBean.CategoriesBean category : categories) {
             java.util.List<ReportBean.CategoriesBean.ItemsBean> items = category.getItems();
@@ -329,225 +330,264 @@ public class GenoReportBuilder extends ReportBuilder {
                     if (Integer.parseInt(item.getLevel()) >= 3) {
                         gaoLevel.add(itemsBean);
                     } else if (Integer.parseInt(item.getLevel()) < 3) {
-                        normalLecel.add(itemsBean);
+                        normalLecel.add(category);
                     }
                 }
             }
         }
-        Painting painting = new Painting(pdf);
 
         // 高危项目
         for (ReportBean.ItemsBean itemsBean : gaoLevel) {
-            float score = itemsBean.getScore();
-            String title = itemsBean.getName();
-            java.util.List<ReportBean.ItemsBean.GeneDescBean> geneDesc = itemsBean.getGeneDesc();
-            java.util.List<ReportBean.ItemsBean.ContentsBean> contents = this.handlerContents(itemsBean);
-            java.util.List<ReportBean.ItemsBean.LiteraturesBean> literatures = itemsBean.getLiteratures();
-
-            HeaderTextEvent headerTextEvent = new HeaderTextEvent(title);
-            pdf.addEventHandler(PdfDocumentEvent.START_PAGE, headerTextEvent);
-
-            doc.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
-
-            Paragraph p1 = new Paragraph();
-            p1.add(new Text(itemsBean.getName() + "\n").addStyle(GenoStyle.getTitleStyle()));
-            p1.add(GenoComponent.getSecondTitle("检测结果"));
-            doc.add(p1);
-
-            String categoryCode = itemsBean.getCategoryCode();
-            boolean gaoLevelFlag = "cjzl".equals(categoryCode) || "xhxt".equals(categoryCode) || "cs".equals(categoryCode) || "jsxl".equals(categoryCode) || "ln".equals(categoryCode) || "nfm".equals(categoryCode) || "xnxg".equals(categoryCode) || "zsmy".equals(categoryCode);
-            if (gaoLevelFlag) {
-                // 头条，进度条
-                painting.drawSegment(score);
-
-                // 等级
-                Div progressBlock = new Div();
-                Paragraph level = new Paragraph();
-                level.setWidth(200);
-                Style style = new Style();
-                style.setFontSize(11);
-                style.setMargins(2, -4, 2, 0);
-                style.setPaddings(3, 12, 3, 12);
-                Style attentionStyle = new Style();
-                attentionStyle.setBorderRadius(new BorderRadius(5));
-                attentionStyle.setFontColor(ColorConstants.WHITE);
-
-                Text level1 = new Text("低").addStyle(style);
-                Text level2 = new Text("稍低").addStyle(style);
-                Text level3 = new Text("正常").addStyle(style);
-                Text level4 = new Text("稍高").addStyle(style);
-                Text level5 = new Text("高").addStyle(style);
-                String[] segmenets = Constant.SEGMENETS;
-                Color color = null;
-                if (score >= Float.parseFloat(segmenets[0]) && score < Float.parseFloat(segmenets[1])) {
-                    color = GenoColor.getLightBlueColor();
-                    attentionStyle.setBackgroundColor(color);
-                    level1.addStyle(attentionStyle);
-                } else if (score >= Float.parseFloat(segmenets[1]) && score < Float.parseFloat(segmenets[2])) {
-                    color = GenoColor.getLightBlueColor();
-                    attentionStyle.setBackgroundColor(color);
-                    level2.addStyle(attentionStyle);
-                } else if (score >= Float.parseFloat(segmenets[2]) && score < Float.parseFloat(segmenets[3])) {
-                    color = GenoColor.getThemeColor();
-                    attentionStyle.setBackgroundColor(color);
-                    level3.addStyle(attentionStyle);
-                } else if (score >= Float.parseFloat(segmenets[3]) && score < Float.parseFloat(segmenets[4])) {
-                    color = GenoColor.getOrangeColor();
-                    attentionStyle.setBackgroundColor(color);
-                    level4.addStyle(attentionStyle);
-                } else if (score >= Float.parseFloat(segmenets[4]) && score <= Float.parseFloat(segmenets[5])) {
-                    color = GenoColor.getRedColor();
-                    attentionStyle.setBackgroundColor(color);
-                    level5.addStyle(attentionStyle);
-                }
-                level.add(level1);
-                level.add(level2);
-                level.add(level3);
-                level.add(level4);
-                level.add(level5);
-                level.setHorizontalAlignment(HorizontalAlignment.CENTER);
-                progressBlock.add(level);
-                doc.add(progressBlock);
-
-                // 正文
-                int index = 0;
-                Paragraph p2 = new Paragraph();
-                p2.setMarginTop(60);
-                p2.add(new Tab());
-                p2.addTabStops(new TabStop(20, TabAlignment.LEFT));
-                p2.add("您的基因风险指数为");
-                p2.add(new Text(score + "").setFontColor(color));
-                switch (index) {
-                    case 0:
-                    case 1:
-                        p2.add("。在相同外界条件下，与大多数人相比，您具有较好的基因优势。但也不要忽视了预防，疾病是由基因和外界环境共同作用而导致的，因此仍建议您注意规避外界风险因素，保持良好的生活习惯，加强锻炼，定期进行体检和相关筛查。");
-                        break;
-                    case 2:
-                        p2.add("。在相同外界条件下，您与大多数人的患病风险相同。基因风险相同情况下，最终患病与否，与外界环境、生活习惯和医疗条件的差异密切相关。因此，仍建议您重视预防" + itemsBean.getName() + "，注意规避外界风险因素，保持良好的生活习惯，加强锻炼，定期进行体检和相关筛查。");
-                    case 3:
-                        p2.add("。在相同外界条件下，您患" + itemsBean.getName() + "的风险比正常人群稍高。建议您尽可能规避相关高危因素、调整生活习惯，改变不利的生活方式，定期进行体检和相关筛查，认真对待相关急慢性疾病（如发生）的治疗和医疗干预。");
-                    case 4:
-                        p2.add("。在相同外界条件下，您患" + itemsBean.getName() + "的风险高于正常人群。建议您尽可能规避" + itemsBean.getName() + "相关高危因素、调整生活习惯，改变不利的生活方式，定期进行体检和相关筛查，认真对待相关急慢性疾病（如发生）的治疗和医疗干预。");
-                    default:
-                        break;
-                }
-                doc.add(p2);
-            }
-
-            // TODO 遗传病不知道样式
-            if ("ycb".equals(categoryCode)) {
-                if ("未检出".equals(itemsBean.getLabel())) {
-
-                }
-            }
-            // 维生素矿物质
-            boolean wssFlag = "wss".equals(categoryCode) || "kwz".equals(categoryCode);
-            if (wssFlag) {
-                painting.drawWss(Integer.parseInt(itemsBean.getLevel()), itemsBean);
-            }
-
-            // 个性特质 天赋潜能 美容护肤 纤体瘦身
-            boolean personFlag = "gxtz".equals(categoryCode) || "jfss".equals(categoryCode) || "mrhf".equals(categoryCode) || "jfss".equals(categoryCode) || "categoryCode".equals(itemsBean.getCode());
-            if (personFlag) {
-                this.addPersonalityTraits(itemsBean, categoryCode);
-            }
-
-            // 基因位点信息
-            Paragraph p2 = new Paragraph("基因位点信息").addStyle(GenoStyle.getSecondTitleStyle());
-            if (wssFlag) {
-                p2.setMarginTop(110);
-            }
-            doc.add(p2);
-            Table geneLocusTable = new Table(4).useAllAvailableWidth();
-            geneLocusTable.addCell(GenoComponent.getTableCell().add(new Paragraph("基因位点")).addStyle(GenoStyle.getTableHeader()));
-            geneLocusTable.addCell(GenoComponent.getTableCell().add(new Paragraph("参考型")).addStyle(GenoStyle.getTableHeader()));
-            geneLocusTable.addCell(GenoComponent.getTableCell().add(new Paragraph("检出型")).addStyle(GenoStyle.getTableHeader()));
-            geneLocusTable.addCell(GenoComponent.getTableCell().add(new Paragraph("基因型解释")).addStyle(GenoStyle.getTableHeader()));
-            geneLocusTable.startNewRow();
-            for (ReportBean.ItemsBean.GeneDescBean geneDescBean : geneDesc) {
-                geneLocusTable.addCell(GenoComponent.getTableCell().setPadding(0).add(new Paragraph(geneDescBean.getOg_id())));
-                geneLocusTable.addCell(GenoComponent.getTableCell().setPadding(0).add(new Paragraph(geneDescBean.getRef_genotype())));
-                geneLocusTable.addCell(GenoComponent.getTableCell().setPadding(0).add(new Paragraph(geneDescBean.getGenotype())));
-                geneLocusTable.addCell(GenoComponent.getTableCell().setPadding(0).add(new Paragraph(geneDescBean.getLabel())));
-                geneLocusTable.startNewRow();
-            }
-            doc.add(geneLocusTable);
-
-            // 简介，症状，健康建议，基因解读
-            long count = contents.stream().filter(content -> "健康建议".equals(content.getLabel())).count();
-            long count2 = count - 1;
-            for (ReportBean.ItemsBean.ContentsBean content : contents) {
-                if ("健康建议".equals(content.getLabel())) {
-                    count--;
-                    if (count < count2) {
-                        doc.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
-                    }
-                }
-                doc.add(GenoComponent.getTitleParagraph(GenoComponent.getSecondTitle(content.getLabel())));
-                String value = content.getValue();
-                java.util.List<IElement> iElements = getFixContent(value);
-                for (IElement iElement : iElements) {
-                    Style style = new Style();
-                    style.setFontSize(10);
-                    style.setCharacterSpacing(0.8f);
-                    if (iElement instanceof Div) {
-                        Div div = (Div) iElement;
-                        java.util.List<IElement> children = div.getChildren();
-                        for (IElement child : children) {
-                            if (child instanceof Paragraph) {
-                                Paragraph element = (Paragraph) child;
-                                element.addStyle(style);
-                                element.setFixedLeading(15);
-                                element.setMultipliedLeading(2);
-                            }
-                        }
-                        doc.add(div);
-                    } else if (iElement instanceof Paragraph) {
-                        Paragraph element = (Paragraph) iElement;
-                        element.setFixedLeading(15);
-                        element.setMultipliedLeading(2);
-                        doc.add(element.addStyle(style));
-                    }
-                }
-
-            }
-
-            // 文献
-            int number = 1;
-            Div literatureDiv = new Div();
-            Paragraph titleParagraph = GenoComponent.getTitleParagraph(new Text("参考文献（部分）").addStyle(GenoStyle.getSecondTitleStyle()));
-            literatureDiv.add(titleParagraph);
-            literatureDiv.setKeepTogether(true);
-            for (ReportBean.ItemsBean.LiteraturesBean literature : literatures) {
-                Paragraph segment = new Paragraph();
-                segment.setFontSize(9f).setFontColor(new DeviceRgb(85, 85, 85));
-                segment.add(new Text("[" + (number++) + "]"));
-                segment.add(new Text(literature.getAuthor() + ". "));
-                segment.add(new Text(literature.getTitle() + ". "));
-                segment.add(new Text(literature.getJournal() + ". "));
-                segment.add(new Text(literature.getSerialNumber()));
-                literatureDiv.add(segment);
-            }
-            doc.add(literatureDiv);
-
-            // 移除监听器
-            pdf.removeEventHandler(PdfDocumentEvent.START_PAGE, headerTextEvent);
+            this.addBodyText(itemsBean);
         }
 
         // 正常项目
-        for (ReportBean.ItemsBean itemsBean : normalLecel) {
+        for (ReportBean.CategoriesBean categoriesBean : normalLecel) {
+            int unlockedItems = categoriesBean.getUnlockedItems();
+            if (unlockedItems == 0) {
+                continue;
+            }
+            doc.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
+            Image backgroundImage = new Image(ImageDataFactory.create(GenoReportBuilder.class.getClassLoader().getResource("image/" + categoriesBean.getCode() + ".png")));
+            doc.add(backgroundImage);
+
+            java.util.List<ReportBean.CategoriesBean.ItemsBean> items = categoriesBean.getItems();
+            for (ReportBean.CategoriesBean.ItemsBean item : items) {
+                ReportBean.ItemsBean itemsBean = reportBean.getItems().get(item.getCode());
+                if (item.getLocked() || item.getIndex() >= 3) {
+                    continue;
+                }
+                this.addBodyText(itemsBean);
+            }
 
         }
 
-        painting.close();
         return this;
+    }
+
+    /**
+     * 添加主体文本
+     *
+     * @param itemsBean
+     */
+    private void addBodyText(ReportBean.ItemsBean itemsBean) {
+        float score = itemsBean.getScore();
+        String title = itemsBean.getName();
+        java.util.List<ReportBean.ItemsBean.GeneDescBean> geneDesc = itemsBean.getGeneDesc();
+        java.util.List<ReportBean.ItemsBean.ContentsBean> contents = this.handlerContents(itemsBean);
+        java.util.List<ReportBean.ItemsBean.LiteraturesBean> literatures = itemsBean.getLiteratures();
+
+        HeaderTextEvent headerTextEvent = new HeaderTextEvent(title);
+        pdf.addEventHandler(PdfDocumentEvent.START_PAGE, headerTextEvent);
+
+        doc.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
+
+        Paragraph p1 = new Paragraph();
+        p1.add(new Text(itemsBean.getName() + "\n").addStyle(GenoStyle.getTitleStyle()));
+        p1.add(GenoComponent.getSecondTitle("检测结果"));
+        doc.add(p1);
+
+        Painting painting = new Painting(pdf);
+
+        String categoryCode = itemsBean.getCategoryCode();
+        boolean gaoLevelFlag = "cjzl".equals(categoryCode) || "xhxt".equals(categoryCode) || "cs".equals(categoryCode) || "jsxl".equals(categoryCode) || "ln".equals(categoryCode) || "nfm".equals(categoryCode) || "xnxg".equals(categoryCode) || "zsmy".equals(categoryCode);
+        if (gaoLevelFlag) {
+            // 头条，进度条
+            painting.drawSegment(score);
+
+            // 等级
+            Div progressBlock = new Div();
+            Paragraph level = new Paragraph();
+            level.setWidth(200);
+            Style style = new Style();
+            style.setFontSize(11);
+            style.setMargins(2, -4, 2, 0);
+            style.setPaddings(3, 12, 3, 12);
+            Style attentionStyle = new Style();
+            attentionStyle.setBorderRadius(new BorderRadius(5));
+            attentionStyle.setFontColor(ColorConstants.WHITE);
+
+            Text level1 = new Text("低").addStyle(style);
+            Text level2 = new Text("稍低").addStyle(style);
+            Text level3 = new Text("正常").addStyle(style);
+            Text level4 = new Text("稍高").addStyle(style);
+            Text level5 = new Text("高").addStyle(style);
+            String[] segmenets = Constant.SEGMENETS;
+            Color color = null;
+            if (score >= Float.parseFloat(segmenets[0]) && score < Float.parseFloat(segmenets[1])) {
+                color = GenoColor.getLightBlueColor();
+                attentionStyle.setBackgroundColor(color);
+                level1.addStyle(attentionStyle);
+            } else if (score >= Float.parseFloat(segmenets[1]) && score < Float.parseFloat(segmenets[2])) {
+                color = GenoColor.getLightBlueColor();
+                attentionStyle.setBackgroundColor(color);
+                level2.addStyle(attentionStyle);
+            } else if (score >= Float.parseFloat(segmenets[2]) && score < Float.parseFloat(segmenets[3])) {
+                color = GenoColor.getThemeColor();
+                attentionStyle.setBackgroundColor(color);
+                level3.addStyle(attentionStyle);
+            } else if (score >= Float.parseFloat(segmenets[3]) && score < Float.parseFloat(segmenets[4])) {
+                color = GenoColor.getOrangeColor();
+                attentionStyle.setBackgroundColor(color);
+                level4.addStyle(attentionStyle);
+            } else if (score >= Float.parseFloat(segmenets[4]) && score <= Float.parseFloat(segmenets[5])) {
+                color = GenoColor.getRedColor();
+                attentionStyle.setBackgroundColor(color);
+                level5.addStyle(attentionStyle);
+            }
+            level.add(level1);
+            level.add(level2);
+            level.add(level3);
+            level.add(level4);
+            level.add(level5);
+            level.setHorizontalAlignment(HorizontalAlignment.CENTER);
+            progressBlock.add(level);
+            doc.add(progressBlock);
+
+            // 正文
+            int index = 0;
+            Paragraph p2 = new Paragraph();
+            p2.setMarginTop(60);
+            p2.add(new Tab());
+            p2.addTabStops(new TabStop(20, TabAlignment.LEFT));
+            p2.add("您的基因风险指数为");
+            p2.add(new Text(score + "").setFontColor(color));
+            switch (index) {
+                case 0:
+                case 1:
+                    p2.add("。在相同外界条件下，与大多数人相比，您具有较好的基因优势。但也不要忽视了预防，疾病是由基因和外界环境共同作用而导致的，因此仍建议您注意规避外界风险因素，保持良好的生活习惯，加强锻炼，定期进行体检和相关筛查。");
+                    break;
+                case 2:
+                    p2.add("。在相同外界条件下，您与大多数人的患病风险相同。基因风险相同情况下，最终患病与否，与外界环境、生活习惯和医疗条件的差异密切相关。因此，仍建议您重视预防" + itemsBean.getName() + "，注意规避外界风险因素，保持良好的生活习惯，加强锻炼，定期进行体检和相关筛查。");
+                case 3:
+                    p2.add("。在相同外界条件下，您患" + itemsBean.getName() + "的风险比正常人群稍高。建议您尽可能规避相关高危因素、调整生活习惯，改变不利的生活方式，定期进行体检和相关筛查，认真对待相关急慢性疾病（如发生）的治疗和医疗干预。");
+                case 4:
+                    p2.add("。在相同外界条件下，您患" + itemsBean.getName() + "的风险高于正常人群。建议您尽可能规避" + itemsBean.getName() + "相关高危因素、调整生活习惯，改变不利的生活方式，定期进行体检和相关筛查，认真对待相关急慢性疾病（如发生）的治疗和医疗干预。");
+                default:
+                    break;
+            }
+            doc.add(p2);
+        }
+
+        // TODO 遗传病不知道样式
+        if ("ycb".equals(categoryCode)) {
+            if ("未检出".equals(itemsBean.getLabel())) {
+
+            }
+        }
+        // 维生素矿物质
+        boolean wssFlag = "wss".equals(categoryCode) || "kwz".equals(categoryCode);
+        if (wssFlag) {
+            painting.drawWss(Integer.parseInt(itemsBean.getLevel()), itemsBean);
+        }
+
+        // 个性特质 天赋潜能 美容护肤 纤体瘦身
+        boolean personFlag = "gxtz".equals(categoryCode) || "jfss".equals(categoryCode) || "mrhf".equals(categoryCode) || "jfss".equals(categoryCode) || "categoryCode".equals(itemsBean.getCode());
+        if (personFlag) {
+            this.addPersonalityTraits(itemsBean, categoryCode);
+        }
+
+        // 基因位点信息
+        Paragraph p2 = new Paragraph("基因位点信息").addStyle(GenoStyle.getSecondTitleStyle());
+        if (wssFlag) {
+            p2.setMarginTop(110);
+        }
+        doc.add(p2);
+        Table geneLocusTable = new Table(4).useAllAvailableWidth();
+        geneLocusTable.addCell(GenoComponent.getTableCell().add(new Paragraph("基因位点")).addStyle(GenoStyle.getTableHeader()));
+        geneLocusTable.addCell(GenoComponent.getTableCell().add(new Paragraph("参考型")).addStyle(GenoStyle.getTableHeader()));
+        geneLocusTable.addCell(GenoComponent.getTableCell().add(new Paragraph("检出型")).addStyle(GenoStyle.getTableHeader()));
+        geneLocusTable.addCell(GenoComponent.getTableCell().add(new Paragraph("基因型解释")).addStyle(GenoStyle.getTableHeader()));
+        geneLocusTable.startNewRow();
+        for (ReportBean.ItemsBean.GeneDescBean geneDescBean : geneDesc) {
+            geneLocusTable.addCell(GenoComponent.getTableCell().setPadding(0).add(new Paragraph(geneDescBean.getOg_id())));
+            geneLocusTable.addCell(GenoComponent.getTableCell().setPadding(0).add(new Paragraph(geneDescBean.getRef_genotype())));
+            geneLocusTable.addCell(GenoComponent.getTableCell().setPadding(0).add(new Paragraph(geneDescBean.getGenotype())));
+            geneLocusTable.addCell(GenoComponent.getTableCell().setPadding(0).add(new Paragraph(geneDescBean.getLabel())));
+            geneLocusTable.startNewRow();
+        }
+        doc.add(geneLocusTable);
+
+        // 简介，症状，健康建议，基因解读
+        long count = contents.stream().filter(content -> "健康建议".equals(content.getLabel())).count();
+        long count2 = count - 1;
+        for (ReportBean.ItemsBean.ContentsBean content : contents) {
+            if ("健康建议".equals(content.getLabel())) {
+                count--;
+                if (count < count2) {
+                    doc.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
+                }
+            }
+            Div overall = new Div();
+            if ("症状".equals(content.getLabel())) {
+                overall.setKeepTogether(true);
+            }
+            overall.add(GenoComponent.getTitleParagraph(GenoComponent.getSecondTitle(content.getLabel())));
+            String value = content.getValue();
+            if (StringUtils.isEmpty(value)) {
+                continue;
+            }
+            java.util.List<IElement> iElements = getFixContent(value);
+            for (IElement iElement : iElements) {
+                Style style = new Style();
+                style.setFontSize(10);
+                style.setCharacterSpacing(0.7f);
+                if (iElement instanceof Div) {
+                    Div div = (Div) iElement;
+                    java.util.List<IElement> children = div.getChildren();
+                    // 全部段落改成相同样式
+                    this.addParagraphStyleCircle(style, children);
+                    overall.add(div);
+                } else if (iElement instanceof Paragraph) {
+                    Paragraph element = (Paragraph) iElement;
+                    overall.add(element.addStyle(style));
+                }
+            }
+            doc.add(overall);
+        }
+
+        // 文献
+        int number = 1;
+        Div literatureDiv = new Div();
+        Paragraph titleParagraph = GenoComponent.getTitleParagraph(new Text("参考文献（部分）").addStyle(GenoStyle.getSecondTitleStyle()));
+        literatureDiv.add(titleParagraph);
+        literatureDiv.setKeepTogether(true);
+        for (ReportBean.ItemsBean.LiteraturesBean literature : literatures) {
+            Paragraph segment = new Paragraph();
+            segment.setFontSize(9f).setFontColor(new DeviceRgb(85, 85, 85));
+            segment.add(new Text("[" + (number++) + "]"));
+            segment.add(new Text(literature.getAuthor() + ". "));
+            segment.add(new Text(literature.getTitle() + ". "));
+            segment.add(new Text(literature.getJournal() + ". "));
+            segment.add(new Text(literature.getSerialNumber()));
+            literatureDiv.add(segment);
+        }
+        doc.add(literatureDiv);
+
+        // 移除监听器
+        pdf.removeEventHandler(PdfDocumentEvent.START_PAGE, headerTextEvent);
+        painting.close();
+    }
+
+    private void addParagraphStyleCircle(Style style, java.util.List<IElement> children) {
+        for (IElement child : children) {
+            if (child instanceof Paragraph) {
+                Paragraph element = (Paragraph) child;
+                element.addStyle(style);
+            }
+            if (child instanceof Div) {
+                Div div = (Div) child;
+                java.util.List<IElement> children1 = div.getChildren();
+                this.addParagraphStyleCircle(style, children1);
+            }
+        }
     }
 
     private java.util.List<IElement> getFixContent(String content) {
         if (content.startsWith("<div>")) {
-            content = content.replaceAll("<div>", "<div style='line-height:20pt'>");
+            content = content.replaceAll("<div>", "<div style='line-height:20pt;font-size:16px;'>");
         } else {
-            content = "<div style='line-height:20pt'>" + content + "</div>";
+            content = "<div style='line-height:20pt;font-size:16px;'>" + content + "</div>";
         }
         return HtmlConverter.convertToElements(content, proper);
     }
@@ -611,7 +651,7 @@ public class GenoReportBuilder extends ReportBuilder {
                 "\n" +
                 "\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0如果您对我们检测服务和体验有任何意见或建议，敬请拨打我们的健康热线400-163-5588，或者手机扫描下部二维码，联系您的专属健康顾问。"));
         doc.add(p1);
-        URL resource = Painting.class.getClassLoader().getResource("image/结束语.png");
+        URL resource = GenoReportBuilder.class.getClassLoader().getResource("image/结束语.png");
         Image backImage = new Image(ImageDataFactory.create(resource));
         int pageNum = pdf.getNumberOfPages();
         backImage.setFixedPosition(pageNum, 0, 0, UnitValue.createPercentValue(125));
