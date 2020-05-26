@@ -522,7 +522,7 @@ public class GenoReportBuilder extends ReportBuilder {
             if ("症状".equals(content.getLabel())) {
                 overall.setKeepTogether(true);
             }
-            overall.add(GenoComponent.getTitleParagraph(GenoComponent.getSecondTitle(content.getLabel())));
+            overall.add(GenoComponent.getTitleParagraph(GenoComponent.getSecondTitle(content.getLabel())).setPaddingBottom(3).setPaddingTop(3));
             String value = content.getValue();
             if (StringUtils.isEmpty(value)) {
                 continue;
