@@ -42,7 +42,6 @@
             </exclusions>
         </dependency>
         <!-- itext7 -->
-
         <dependency>
             <groupId>com.itextpdf</groupId>
             <artifactId>kernel</artifactId>

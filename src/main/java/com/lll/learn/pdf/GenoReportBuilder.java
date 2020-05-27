@@ -312,7 +312,8 @@ public class GenoReportBuilder extends ReportBuilder {
                 continue;
             }
             doc.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
-            Image backgroundImage = new Image(ImageDataFactory.create(GenoReportBuilder.class.getClassLoader().getResource("image/" + categoriesBean.getCode() + ".png")));
+            URL resource = GenoReportBuilder.class.getClassLoader().getResource("image/" + categoriesBean.getCode() + ".png");
+            Image backgroundImage = new Image(ImageDataFactory.create(resource));
             doc.add(backgroundImage);
 
             java.util.List<ReportBean.CategoriesBean.ItemsBean> items = categoriesBean.getItems();
