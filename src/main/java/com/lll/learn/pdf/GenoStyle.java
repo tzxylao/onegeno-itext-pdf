@@ -22,7 +22,7 @@ public class GenoStyle {
 
     public static Style getTitleStyle() {
         Style style = new Style();
-        style.setFontSize(16);
+        style.setFontSize(20);
         style.setBold();
         style.setFontColor(GenoColor.getThemeColor());
         return style;

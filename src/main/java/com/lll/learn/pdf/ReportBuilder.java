@@ -17,9 +17,14 @@ import com.itextpdf.layout.Document;
 import com.itextpdf.layout.font.FontProvider;
 import com.itextpdf.layout.font.FontSet;
 import com.lll.learn.data.PrintReportBean;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * @author: laoliangliang
@@ -35,6 +40,9 @@ public abstract class ReportBuilder {
     protected String outPath;
     protected PrintReportBean reportBean;
     protected ConverterProperties proper;
+    protected Map<GenoReportBuilder.ExtraParam.CatalogType, java.util.List<GenoReportBuilder.CataLog>> cataLogsMap = new HashMap<>();
+    protected Properties properties = new Properties();
+
 
     public void setPrintReportBean(PrintReportBean printReportBean) {
         this.reportBean = printReportBean;
@@ -44,17 +52,18 @@ public abstract class ReportBuilder {
         this.outPath = outPath;
         writer = new PdfWriter(new File(outPath));
         pdf = new PdfDocument(writer);
-        pdf.addEventHandler(PdfDocumentEvent.END_PAGE, new EndPageEventHandler(this));
-        pdf.addEventHandler(PdfDocumentEvent.START_PAGE, new StartPageEventHandler(this));
+        pdf.addEventHandler(PdfDocumentEvent.END_PAGE, new EndPageEventHandler());
+        pdf.addEventHandler(PdfDocumentEvent.START_PAGE, new StartPageEventHandler());
         pdf.setDefaultPageSize(PageSize.A4);
         pdf.getDefaultPageSize().applyMargins(0, 0, 0, 0, true);
 
 //        PdfFont font = PdfFontFactory.createFont("STSong-Light", "UniGB-UCS2-H", true);
         font = PdfFontFactory.createFont(ReportBuilder.class.getClassLoader().getResource("font/SourceHanSansCN-Regular.ttf").getPath(), PdfEncodings.IDENTITY_H, true);
         doc = new Document(pdf);
-        doc.setMargins(50, 60, 60, 60);
+        doc.setMargins(50, 60, 50, 60);
         doc.setFont(font);
         doc.setFontSize(10.5f);
+        doc.setCharacterSpacing(0.1f);
 
         proper = new ConverterProperties();
         //字体设置，解决中文不显示问题
@@ -64,14 +73,17 @@ public abstract class ReportBuilder {
         proper.setFontProvider(fontProvider);
     }
 
+    @Data
+    @AllArgsConstructor
+    protected class CataLog {
+        private String categoryName;
+        private String name;
+        private String label;
+        private Integer page;
+        private GenoReportBuilder.ExtraParam extraParam;
+    }
 
     protected class EndPageEventHandler implements IEventHandler {
-
-        private ReportBuilder builder;
-
-        public EndPageEventHandler(ReportBuilder reportBuilder) {
-            this.builder = reportBuilder;
-        }
 
         @Override
         public void handleEvent(Event event) {
@@ -80,37 +92,27 @@ public abstract class ReportBuilder {
             PdfPage page = docEvent.getPage();
             int pageNumber = pdfDoc.getPageNumber(page);
             Rectangle pageSize = page.getPageSize();
+            String forbidPage = properties.getProperty("forbidPage");
 
-            PdfCanvas pdfCanvas = new PdfCanvas(page.newContentStreamBefore(), page.getResources(), pdfDoc);
+            if (pageNumber > 7 && pageNumber != 9) {
+                if (forbidPage != null && pageNumber>=Integer.parseInt(forbidPage)) {
+                    return;
+                }
+                PdfCanvas pdfCanvas = new PdfCanvas(page.newContentStreamBefore(), page.getResources(), pdfDoc);
 
-            //Add header and footer
-            pdfCanvas.beginText()
-                    .setFontAndSize(font, 9)
-                    .moveText(pageSize.getWidth() / 2, 30)
-                    .showText(String.format("- %d -", pageNumber))
-                    .endText();
+                //Add header and footer
+                pdfCanvas.beginText()
+                        .setFontAndSize(font, 9)
+                        .moveText(pageSize.getWidth() / 2, 30)
+                        .showText(String.format("- %d -", (pageNumber+1)))
+                        .endText();
 
-            pdfCanvas.release();
-
-//            if (pageNumber >= 7 && pageNumber != 9) {
-//                String text = headerLineTextMap.get(pageNumber);
-//                if (text != null) {
-//                    // 头条，进度条
-//                    Painting painting = new Painting(pdf, builder);
-//                    painting.drawHeader();
-//                    painting.close();
-//                }
-//            }
+                pdfCanvas.release();
+            }
         }
     }
 
     protected class StartPageEventHandler implements IEventHandler {
-
-        private ReportBuilder builder;
-
-        public StartPageEventHandler(ReportBuilder reportBuilder) {
-            this.builder = reportBuilder;
-        }
 
         @Override
         public void handleEvent(Event event) {
@@ -165,11 +167,6 @@ public abstract class ReportBuilder {
     public abstract GenoReportBuilder addDetectionContent();
 
     /**
-     * 添加目录
-     */
-    public abstract GenoReportBuilder addDirectory();
-
-    /**
      * 检测结果概况
      */
     public abstract GenoReportBuilder addResultSummary();
@@ -188,4 +185,9 @@ public abstract class ReportBuilder {
      * 封底
      */
     public abstract GenoReportBuilder addBackCover();
+
+    /**
+     * 目录
+     */
+    public abstract GenoReportBuilder addCatalog();
 }

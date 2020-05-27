@@ -10,15 +10,18 @@ import com.itextpdf.kernel.events.PdfDocumentEvent;
 import com.itextpdf.layout.Style;
 import com.itextpdf.layout.borders.SolidBorder;
 import com.itextpdf.layout.element.*;
+import com.itextpdf.layout.element.List;
 import com.itextpdf.layout.property.*;
 import com.lll.learn.data.ReportBean;
 import com.lll.learn.pdf.event.HeaderTextEvent;
+import lombok.Data;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Date;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author: laoliangliang
@@ -35,8 +38,11 @@ public class GenoReportBuilder extends ReportBuilder {
     @Override
     public GenoReportBuilder addIndex() {
         Image indexImage = new Image(ImageDataFactory.create(GenoReportBuilder.class.getClassLoader().getResource("image/成人纸质报告-54.png")));
+        indexImage.setMargins(-50, -60, -60, -60);
         Image introductionImage = new Image(ImageDataFactory.create(GenoReportBuilder.class.getClassLoader().getResource("image/gene.png")));
+        introductionImage.setMargins(-50, -60, -60, -60);
         Image honorImage = new Image(ImageDataFactory.create(GenoReportBuilder.class.getClassLoader().getResource("image/honor.png")));
+        honorImage.setMargins(-50, -60, -60, -60);
 
         doc.add(indexImage);
         pdf.addNewPage(2).flush();
@@ -96,7 +102,7 @@ public class GenoReportBuilder extends ReportBuilder {
         doc.add(div1);
 
         Div div2 = new Div();
-        div2.addStyle(GenoStyle.getDefaultTableOuter());
+        div2.addStyle(GenoStyle.getDefaultTableOuter().setBorder(new SolidBorder(GenoColor.getThemeColor(), 0.7f)));
         Table table = new Table(3).useAllAvailableWidth();
         table.addCell(GenoComponent.getDefaultCell().add(GenoComponent.getSignParagraph("姓 名：" + index.getName())));
         table.addCell(GenoComponent.getDefaultCell().add(GenoComponent.getSignParagraph("性 别： " + ("FEMALE".equals(index.getGender()) ? "女" : "MALE".equals(index.getGender()) ? "男" : ""))));
@@ -138,7 +144,7 @@ public class GenoReportBuilder extends ReportBuilder {
                 "2、检测基因和位点以及用于解读报告的数据库，会随着基因库的增大和医学研究的更新而升级优化。\n" +
                 "3、检测结果可用于指导生活习惯、健康管理和疾病预防⽅案的制定，不作为临床诊断和治疗的依据。\n" +
                 "4、疾病的发生、发展与基因变异密切相关，是基因（内因）与外部环境（外因）共同作用的结果。\n" +
-                "5、基因检测的目的不是去忽视低风险疾病，而是找出高风险疾病，并进行针对性的预防和健康管理，\n" +
+                "5、基因检测的目的不是去忽视低风险疾病，而是找出高风险疾病，并进行针对性的预防和健康管理，" +
                 "以延缓或规避相应疾病的发生。"));
         Div div2 = new Div();
         div2.setMarginTop(30);
@@ -165,49 +171,6 @@ public class GenoReportBuilder extends ReportBuilder {
     }
 
     @Override
-    public GenoReportBuilder addDirectory() {
-        doc.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
-
-        Div div1 = new Div();
-        Paragraph p1 = new Paragraph();
-        p1.add(new Text("目录").addStyle(GenoStyle.getTitleStyle()).setFontSize(32));
-
-        Table tableCatalog = new Table(4).useAllAvailableWidth();
-        tableCatalog.addCell(GenoComponent.getCatelogCell().add(new Paragraph("检测结果概况").addStyle(GenoStyle.getSecondTitleStyle())));
-        tableCatalog.addCell(GenoComponent.getCatelogCell(2).add(GenoComponent.getCatelogDottedLine(1)));
-        tableCatalog.addCell(GenoComponent.getCatelogCell().add(new Paragraph("8")));
-        tableCatalog.startNewRow();
-        // 需要注意 动态变化
-        tableCatalog.addCell(GenoComponent.getCatelogCell().add(new Paragraph("需要注意").addStyle(GenoStyle.getSecondTitleStyle())));
-        tableCatalog.startNewRow();
-
-        tableCatalog.addCell(GenoComponent.getCatelogCell().add(new Paragraph("宫颈癌")));
-        tableCatalog.addCell(GenoComponent.getCatelogCell().add(GenoComponent.getCatelogDottedLine(2)));
-        tableCatalog.addCell(GenoComponent.getCatelogCell().add(new List().add(new ListItem("风险高").setListSymbol(new Image(ImageDataFactory.create(GenoReportBuilder.class.getClassLoader().getResource("image/red-point.png"))).addStyle(GenoStyle.getDefaultPoint())))));
-        tableCatalog.addCell(GenoComponent.getCatelogCell().add(new Paragraph("10")));
-        tableCatalog.startNewRow();
-
-        // 正常项目 动态变化
-        tableCatalog.addCell(GenoComponent.getCatelogCell().add(new Paragraph("正常项目").addStyle(GenoStyle.getSecondTitleStyle())));
-        tableCatalog.startNewRow();
-        tableCatalog.addCell(GenoComponent.getCatelogCell().add(new Paragraph("常见肿瘤类").addStyle(GenoStyle.getSecondTitleStyle().setFontSize(13))));
-        tableCatalog.startNewRow();
-
-        tableCatalog.addCell(GenoComponent.getCatelogCell().add(new Paragraph("胃癌")));
-        tableCatalog.addCell(GenoComponent.getCatelogCell().add(GenoComponent.getCatelogDottedLine(2)));
-        tableCatalog.addCell(GenoComponent.getCatelogCell().add(new List().add(new ListItem("风险正常").setListSymbol(new Image(ImageDataFactory.create(GenoReportBuilder.class.getClassLoader().getResource("image/blue-point.png"))).addStyle(GenoStyle.getDefaultPoint())))));
-        tableCatalog.addCell(GenoComponent.getCatelogCell().add(new Paragraph("23")));
-        tableCatalog.startNewRow();
-
-        tableCatalog.addCell(GenoComponent.getCatelogCell().add(new Paragraph("结束语").addStyle(GenoStyle.getSecondTitleStyle())));
-
-        div1.add(p1);
-        div1.add(tableCatalog);
-        doc.add(div1);
-        return this;
-    }
-
-    @Override
     public GenoReportBuilder addResultSummary() {
         java.util.List<ReportBean.CategoriesBean> categories = reportBean.getCategories();
         ReportBean.IndexBean index = reportBean.getIndex();
@@ -216,7 +179,7 @@ public class GenoReportBuilder extends ReportBuilder {
         Paragraph header = GenoComponent.getHeaderLineText("检测结果概况");
 
         Paragraph p1 = new Paragraph();
-        p1.add(new Text("检测结果概况\n").addStyle(GenoStyle.getTitleStyle()));
+        p1.add(new Text("检测结果概况\n").addStyle(GenoStyle.getTitleStyle().setFontSize(22f)));
         p1.add(new Text("本次检测包括"));
         int size = categories.size();
         for (int i = 0; i < size; i++) {
@@ -295,11 +258,11 @@ public class GenoReportBuilder extends ReportBuilder {
         p2.setFixedPosition(60, 90, UnitValue.createPercentValue(110));
         p2.add(GenoComponent.getSecondTitle("温馨提示\n"));
         p2.add(new Text("1、本检测报告的每项内容主要由检测结果、基因位点信息、简介、健康建议等组成。\n" +
-                "2、我们用基因风险指数来解释和划分您的疾病遗传风险等级,共分为五级,五级及分级" +
-                "标准为:低风险<0.5、0.5≤稍低风险<0.8、0.8≤中等或正常水平风险<1.2、1.2≤稍高风险<1.8、高风险≥1.8。\n" +
-                "3、基因位点信息由四列内容组成,分别为本项目所检测的位点名称、参考基因型(参考型)、检测出" +
+                "2、我们用基因风险指数来解释和划分您的疾病遗传风险等级，共分为五级，五级及分级" +
+                "标准为：低风险<0.5、0.5≤稍低风险<0.8、0.8≤中等或正常水平风险<1.2、1.2≤稍高风险<1.8、高风险≥1.8。\n" +
+                "3、基因位点信息由四列内容组成，分别为本项目所检测的位点名称、参考基因型(参考型)、检测出" +
                 "的基因型(检出型)及该基因型的作用。\n" +
-                "4、因篇幅限制,本页仅展示了部分\"需要注意\"的项目,请在目录或详细检测结果查看全部该类项目。"));
+                "4、因篇幅限制，本页仅展示了部分\"需要注意\"的项目，请在目录或详细检测结果查看全部该类项目。"));
 
         doc.add(header);
         doc.add(p1);
@@ -320,7 +283,7 @@ public class GenoReportBuilder extends ReportBuilder {
     @Override
     public GenoReportBuilder addContext() {
         java.util.List<ReportBean.ItemsBean> gaoLevel = new ArrayList<>();
-        java.util.List<ReportBean.CategoriesBean> normalLecel = new ArrayList<>();
+        java.util.Set<ReportBean.CategoriesBean> normalLecel = new HashSet<>();
         java.util.List<ReportBean.CategoriesBean> categories = reportBean.getCategories();
         for (ReportBean.CategoriesBean category : categories) {
             java.util.List<ReportBean.CategoriesBean.ItemsBean> items = category.getItems();
@@ -338,7 +301,8 @@ public class GenoReportBuilder extends ReportBuilder {
 
         // 高危项目
         for (ReportBean.ItemsBean itemsBean : gaoLevel) {
-            this.addBodyText(itemsBean);
+            ExtraParam extraParam = new ExtraParam(ExtraParam.CatalogType.ATTENTION);
+            this.addBodyText(itemsBean, extraParam);
         }
 
         // 正常项目
@@ -357,7 +321,8 @@ public class GenoReportBuilder extends ReportBuilder {
                 if (item.getLocked() || item.getIndex() >= 3) {
                     continue;
                 }
-                this.addBodyText(itemsBean);
+                ExtraParam extraParam = new ExtraParam(ExtraParam.CatalogType.NORMAL);
+                this.addBodyText(itemsBean, extraParam);
             }
 
         }
@@ -370,9 +335,9 @@ public class GenoReportBuilder extends ReportBuilder {
      *
      * @param itemsBean
      */
-    private void addBodyText(ReportBean.ItemsBean itemsBean) {
+    private void addBodyText(ReportBean.ItemsBean itemsBean, ExtraParam extraParam) {
         float score = itemsBean.getScore();
-        String title = itemsBean.getName();
+        String title = itemsBean.getCategoryName();
         java.util.List<ReportBean.ItemsBean.GeneDescBean> geneDesc = itemsBean.getGeneDesc();
         java.util.List<ReportBean.ItemsBean.ContentsBean> contents = this.handlerContents(itemsBean);
         java.util.List<ReportBean.ItemsBean.LiteraturesBean> literatures = itemsBean.getLiteratures();
@@ -382,6 +347,13 @@ public class GenoReportBuilder extends ReportBuilder {
 
         doc.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
 
+        // 获取当前目录
+        CataLog cataLog = new CataLog(itemsBean.getCategoryName(), itemsBean.getName(), itemsBean.getLabel(), pdf.getNumberOfPages(), extraParam);
+        java.util.List<CataLog> cataLogs = this.cataLogsMap.getOrDefault(extraParam.getType(), new ArrayList<>());
+        cataLogs.add(cataLog);
+        this.cataLogsMap.put(extraParam.getType(), cataLogs);
+
+        // 检测结果正文
         Paragraph p1 = new Paragraph();
         p1.add(new Text(itemsBean.getName() + "\n").addStyle(GenoStyle.getTitleStyle()));
         p1.add(GenoComponent.getSecondTitle("检测结果"));
@@ -452,6 +424,8 @@ public class GenoReportBuilder extends ReportBuilder {
             p2.addTabStops(new TabStop(20, TabAlignment.LEFT));
             p2.add("您的基因风险指数为");
             p2.add(new Text(score + "").setFontColor(color));
+            p2.add("，" + itemsBean.getName());
+            p2.add(new Text(itemsBean.getLabel()).setFontColor(color));
             switch (index) {
                 case 0:
                 case 1:
@@ -500,10 +474,11 @@ public class GenoReportBuilder extends ReportBuilder {
         geneLocusTable.addCell(GenoComponent.getTableCell().add(new Paragraph("基因型解释")).addStyle(GenoStyle.getTableHeader()));
         geneLocusTable.startNewRow();
         for (ReportBean.ItemsBean.GeneDescBean geneDescBean : geneDesc) {
-            geneLocusTable.addCell(GenoComponent.getTableCell().setPadding(0).add(new Paragraph(geneDescBean.getOg_id())));
-            geneLocusTable.addCell(GenoComponent.getTableCell().setPadding(0).add(new Paragraph(geneDescBean.getRef_genotype())));
-            geneLocusTable.addCell(GenoComponent.getTableCell().setPadding(0).add(new Paragraph(geneDescBean.getGenotype())));
-            geneLocusTable.addCell(GenoComponent.getTableCell().setPadding(0).add(new Paragraph(geneDescBean.getLabel())));
+            int padding = -2;
+            geneLocusTable.addCell(GenoComponent.getTableCell().setPadding(padding).add(new Paragraph(geneDescBean.getOg_id())));
+            geneLocusTable.addCell(GenoComponent.getTableCell().setPadding(padding).add(new Paragraph(geneDescBean.getRef_genotype())));
+            geneLocusTable.addCell(GenoComponent.getTableCell().setPadding(padding).add(new Paragraph(geneDescBean.getGenotype())));
+            geneLocusTable.addCell(GenoComponent.getTableCell().setPadding(padding).add(new Paragraph(geneDescBean.getLabel())));
             geneLocusTable.startNewRow();
         }
         doc.add(geneLocusTable);
@@ -520,6 +495,9 @@ public class GenoReportBuilder extends ReportBuilder {
             }
             Div overall = new Div();
             if ("症状".equals(content.getLabel())) {
+                overall.setKeepTogether(true);
+            }
+            if ("基因解读".equals(content.getLabel())) {
                 overall.setKeepTogether(true);
             }
             overall.add(GenoComponent.getTitleParagraph(GenoComponent.getSecondTitle(content.getLabel())).setPaddingBottom(3).setPaddingTop(3));
@@ -554,6 +532,7 @@ public class GenoReportBuilder extends ReportBuilder {
         literatureDiv.setKeepTogether(true);
         for (ReportBean.ItemsBean.LiteraturesBean literature : literatures) {
             Paragraph segment = new Paragraph();
+            segment.setFixedLeading(14);
             segment.setFontSize(9f).setFontColor(new DeviceRgb(85, 85, 85));
             segment.add(new Text("[" + (number++) + "]"));
             segment.add(new Text(literature.getAuthor() + ". "));
@@ -585,9 +564,9 @@ public class GenoReportBuilder extends ReportBuilder {
 
     private java.util.List<IElement> getFixContent(String content) {
         if (content.startsWith("<div>")) {
-            content = content.replaceAll("<div>", "<div style='line-height:20pt;font-size:16px;'>");
+            content = content.replaceAll("<div>", "<div style='line-height:18pt;font-size:16px;'>");
         } else {
-            content = "<div style='line-height:20pt;font-size:16px;'>" + content + "</div>";
+            content = "<div style='line-height:18pt;font-size:16px;'>" + content + "</div>";
         }
         return HtmlConverter.convertToElements(content, proper);
     }
@@ -638,9 +617,11 @@ public class GenoReportBuilder extends ReportBuilder {
     public GenoReportBuilder addThanks() {
         doc.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
 
+        properties.setProperty("forbidPage", pdf.getNumberOfPages()+"");
+
         Paragraph p1 = new Paragraph();
         p1.setHorizontalAlignment(HorizontalAlignment.CENTER);
-        p1.setMaxWidth(UnitValue.createPercentValue(75));
+        p1.setMaxWidth(UnitValue.createPercentValue(80));
         p1.setMarginTop(200f);
         p1.setCharacterSpacing(0.4f);
         p1.add(new Text("\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0再次感谢您选用壹基因提供的基因检测服务。\n" +
@@ -658,6 +639,18 @@ public class GenoReportBuilder extends ReportBuilder {
         backImage.scale(1, 1.05f);
         doc.add(backImage);
 
+        try {
+            Image csQrCodeImage = new Image(ImageDataFactory.create(reportBean.getIndex().getCsQrCode()));
+            csQrCodeImage.setMarginTop(20);
+            csQrCodeImage.setHorizontalAlignment(HorizontalAlignment.CENTER);
+            csQrCodeImage.setWidth(90);
+            csQrCodeImage.setHeight(90);
+            doc.add(csQrCodeImage);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+
+
         return this;
     }
 
@@ -673,6 +666,92 @@ public class GenoReportBuilder extends ReportBuilder {
         backCoverImage.setMarginTop(-80);
         doc.add(backCoverImage);
         return this;
+    }
+
+    @Override
+    public GenoReportBuilder addCatalog() {
+//        PdfPage page = pdf.getPage(7);
+        doc.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
+
+        Div div1 = new Div();
+        Table tableCatalog = new Table(4).useAllAvailableWidth();
+        tableCatalog.addCell(GenoComponent.getCatelogCell().add(new Paragraph("检测结果概况").addStyle(GenoStyle.getSecondTitleStyle())));
+        tableCatalog.addCell(GenoComponent.getCatelogCell(2).add(GenoComponent.getCatelogDottedLine(1)));
+        tableCatalog.addCell(GenoComponent.getCatelogCell().add(new Paragraph("8")));
+        tableCatalog.startNewRow();
+        Paragraph p1 = new Paragraph();
+        p1.add(new Text("目录").addStyle(GenoStyle.getTitleStyle()).setFontSize(32));
+        Set<Map.Entry<ExtraParam.CatalogType, java.util.List<CataLog>>> entries = cataLogsMap.entrySet();
+        for (Map.Entry<ExtraParam.CatalogType, java.util.List<CataLog>> entry : entries) {
+            java.util.List<CataLog> cataLogs = entry.getValue();
+            if (entry.getKey().equals(ExtraParam.CatalogType.ATTENTION)) {
+                // 需要注意 动态变化
+                tableCatalog.addCell(GenoComponent.getCatelogCell().add(new Paragraph("需要注意").addStyle(GenoStyle.getSecondTitleStyle())));
+                tableCatalog.startNewRow();
+                for (CataLog cataLog : cataLogs) {
+                    tableCatalog.addCell(GenoComponent.getCatelogCell().add(new Paragraph(cataLog.getName())));
+                    tableCatalog.addCell(GenoComponent.getCatelogCell().add(GenoComponent.getCatelogDottedLine(2)));
+                    tableCatalog.addCell(GenoComponent.getCatelogCell().add(new List().add(new ListItem(cataLog.getLabel()).setListSymbol(new Image(ImageDataFactory.create(GenoReportBuilder.class.getClassLoader().getResource("image/red-point.png"))).addStyle(GenoStyle.getDefaultPoint())))));
+                    tableCatalog.addCell(GenoComponent.getCatelogCell().add(new Paragraph(cataLog.getPage() + "")));
+                    tableCatalog.startNewRow();
+                }
+            }
+            if (entry.getKey().equals(ExtraParam.CatalogType.NORMAL)) {
+                // 正常项目 动态变化
+                tableCatalog.addCell(GenoComponent.getCatelogCell().add(new Paragraph("正常项目").addStyle(GenoStyle.getSecondTitleStyle())));
+                tableCatalog.startNewRow();
+                Map<String, java.util.List<CataLog>> cataLogMap = cataLogs.stream().collect(Collectors.groupingBy(CataLog::getCategoryName));
+                Set<Map.Entry<String, java.util.List<CataLog>>> entries1 = cataLogMap.entrySet();
+                for (Map.Entry<String, java.util.List<CataLog>> cataLogEntry : entries1) {
+                    String categoryName = cataLogEntry.getKey();
+                    tableCatalog.addCell(GenoComponent.getCatelogCell().add(new Paragraph(categoryName).addStyle(GenoStyle.getSecondTitleStyle().setFontSize(13))));
+                    tableCatalog.startNewRow();
+                    java.util.List<CataLog> values = cataLogEntry.getValue();
+                    for (CataLog cataLog : values) {
+                        tableCatalog.addCell(GenoComponent.getCatelogCell().add(new Paragraph(cataLog.getName())));
+                        tableCatalog.addCell(GenoComponent.getCatelogCell().add(GenoComponent.getCatelogDottedLine(2)));
+                        tableCatalog.addCell(GenoComponent.getCatelogCell().add(new List().add(new ListItem(cataLog.getLabel()).setListSymbol(new Image(ImageDataFactory.create(GenoReportBuilder.class.getClassLoader().getResource("image/blue-point.png"))).addStyle(GenoStyle.getDefaultPoint())))));
+                        tableCatalog.addCell(GenoComponent.getCatelogCell().add(new Paragraph(cataLog.getPage() + "")));
+                        tableCatalog.startNewRow();
+                    }
+
+                }
+            }
+        }
+        tableCatalog.addCell(GenoComponent.getCatelogCell().add(new Paragraph("结束语").addStyle(GenoStyle.getSecondTitleStyle())));
+        div1.add(p1);
+        div1.add(tableCatalog);
+        doc.add(div1);
+        pdf.movePage(pdf.getNumberOfPages(), 7);
+        return this;
+    }
+
+    @Data
+    static class ExtraParam {
+        public enum CatalogType {
+            /**
+             * 目录类别 1-需要注意 2-正常项目
+             */
+            ATTENTION(1), NORMAL(2);
+            private Integer val;
+
+            CatalogType(Integer val) {
+                this.val = val;
+            }
+
+            public Integer val() {
+                return val;
+            }
+        }
+
+        /**
+         * 目录类别 1-需要注意 2-正常项目
+         */
+        private CatalogType type;
+
+        public ExtraParam(CatalogType type) {
+            this.type = type;
+        }
     }
 
 }
