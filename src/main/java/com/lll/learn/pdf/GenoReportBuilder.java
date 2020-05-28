@@ -291,8 +291,8 @@ public class GenoReportBuilder extends ReportBuilder {
 
     @Override
     public GenoReportBuilder addContext() {
-        java.util.List<ReportBean.ItemsBean> gaoLevel = new ArrayList<>();
-        java.util.Set<ReportBean.CategoriesBean> normalLecel = new HashSet<>();
+        java.util.List<ReportBean.ItemsBean> gaoLevel = new LinkedList<>();
+        java.util.Set<ReportBean.CategoriesBean> normalLecel = new LinkedHashSet<>();
         java.util.List<ReportBean.CategoriesBean> categories = reportBean.getCategories();
         for (ReportBean.CategoriesBean category : categories) {
             java.util.List<ReportBean.CategoriesBean.ItemsBean> items = category.getItems();
@@ -494,19 +494,15 @@ public class GenoReportBuilder extends ReportBuilder {
 
         // 简介，症状，健康建议，基因解读
         long count = contents.stream().filter(content -> "健康建议".equals(content.getLabel())).count();
-        long count2 = count - 1;
         for (ReportBean.ItemsBean.ContentsBean content : contents) {
             if (content.getLabel().contains("线上") || content.getLabel().contains("卡路里表") ||
                     content.getLabel().contains("减肥建议") || content.getLabel().contains("饮食护理") || content.getLabel().contains("外部护理")) {
                 continue;
             }
-            if ("健康建议".equals(content.getLabel())) {
-                count--;
-                if (count < count2) {
-                    doc.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
-                }
-            }
             Div overall = new Div();
+            if ("健康建议".equals(content.getLabel())) {
+                overall.setKeepTogether(true);
+            }
             if ("症状".equals(content.getLabel())) {
                 overall.setKeepTogether(true);
             }
