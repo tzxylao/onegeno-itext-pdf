@@ -22,7 +22,7 @@ import lombok.Data;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
 
@@ -40,7 +40,7 @@ public abstract class ReportBuilder {
     protected String outPath;
     protected PrintReportBean reportBean;
     protected ConverterProperties proper;
-    protected Map<GenoReportBuilder.ExtraParam.CatalogType, java.util.List<GenoReportBuilder.CataLog>> cataLogsMap = new HashMap<>();
+    protected Map<GenoReportBuilder.ExtraParam.CatalogType, java.util.List<GenoReportBuilder.CataLog>> cataLogsMap = new LinkedHashMap<>();
     protected Properties properties = new Properties();
 
 
@@ -50,10 +50,11 @@ public abstract class ReportBuilder {
 
     public void initPdf(String outPath) throws IOException {
         this.outPath = outPath;
-        writer = new PdfWriter(new File(outPath));
+        String inPath = getInPath();
+        writer = new PdfWriter(new File(inPath));
         pdf = new PdfDocument(writer);
-        pdf.addEventHandler(PdfDocumentEvent.END_PAGE, new EndPageEventHandler());
-        pdf.addEventHandler(PdfDocumentEvent.START_PAGE, new StartPageEventHandler());
+//        pdf.addEventHandler(PdfDocumentEvent.END_PAGE, new EndPageEventHandler());
+//        pdf.addEventHandler(PdfDocumentEvent.START_PAGE, new StartPageEventHandler());
         pdf.setDefaultPageSize(PageSize.A4);
         pdf.getDefaultPageSize().applyMargins(0, 0, 0, 0, true);
 
@@ -73,9 +74,19 @@ public abstract class ReportBuilder {
         proper.setFontProvider(fontProvider);
     }
 
+    protected String getInPath() {
+        int index = outPath.lastIndexOf("/");
+        String fileName = outPath.substring(index);
+        String prefix = outPath.substring(0, index);
+        String[] split = fileName.split("\\.");
+        String name = split[0];
+        return prefix + name + "_temp.pdf";
+    }
+
     @Data
     @AllArgsConstructor
     protected class CataLog {
+        private Integer index;
         private String categoryName;
         private String name;
         private String label;
@@ -155,6 +166,7 @@ public abstract class ReportBuilder {
         try {
             doc.close();
             pdf.close();
+            pdf.close();
             writer.close();
         } catch (IOException e) {
             e.printStackTrace();
@@ -190,4 +202,10 @@ public abstract class ReportBuilder {
      * 目录
      */
     public abstract GenoReportBuilder addCatalog();
+
+    /**
+     * 页码
+     */
+    public abstract GenoReportBuilder addPageNumber();
+
 }

@@ -1,5 +1,6 @@
 package com.lll.learn;
 
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
@@ -11,6 +12,7 @@ import com.lll.learn.pdf.GenoReportBuilder;
 import com.lll.learn.pdf.ReportBuilder;
 import org.springframework.util.StopWatch;
 
+import java.io.File;
 import java.io.IOException;
 
 /**
@@ -25,13 +27,21 @@ public class PdfMain {
         ReportBuilder reportBuilder = new GenoReportBuilder();
         reportBuilder.initPdf("/Users/laoliangliang/Desktop/report.pdf");
         // 获取真实数据
-        HttpRequest request = HttpUtil.createPost(
-                "http://result.dev.1genehealth.com/api/v1/biology/bio/report/print?access_token=421e6833-aafc-4640-9bc2-352331c1902e&uuid=5f60026ec7f1417a81be90d571415389&mold=&type=1");
-        HttpResponse execute = request.execute();
-        String body = execute.body();
-        Result<PrintReportBean> reportBeanResult = JSON.parseObject(body, new TypeReference<Result<PrintReportBean>>(){});
-//        String requestStr = FileUtil.readString(new File(PdfMain.class.getClassLoader().getResource("test/request.json").getPath()), "UTF-8");
-//        Result<PrintReportBean> reportBeanResult = JSON.parseObject(requestStr, new TypeReference<Result<PrintReportBean>>(){});
+        int selected = 0;
+        Result<PrintReportBean> reportBeanResult;
+        if (selected == 0) {
+            HttpRequest request = HttpUtil.createPost(
+                    "http://result.dev.1genehealth.com/api/v1/biology/bio/report/print?access_token=0e7ad759-f724-4780-b549-24fea237c561&uuid=5f60026ec7f1417a81be90d571415389&mold=&type=1");
+            HttpResponse execute = request.execute();
+            String body = execute.body();
+            reportBeanResult = JSON.parseObject(body, new TypeReference<Result<PrintReportBean>>() {
+            });
+        } else {
+            String requestStr = FileUtil.readString(new File(PdfMain.class.getClassLoader().getResource("test/request.json").getPath()), "UTF-8");
+            reportBeanResult = JSON.parseObject(requestStr, new TypeReference<Result<PrintReportBean>>() {
+            });
+        }
+
 
         PrintReportBean data = reportBeanResult.getData();
         reportBuilder.setPrintReportBean(data);
@@ -40,12 +50,12 @@ public class PdfMain {
                 .addHello()
                 .addExaminee()
                 .addDetectionContent()
-//                .addDirectory()
                 .addResultSummary()
                 .addContext()
                 .addThanks()
                 .addBackCover()
                 .addCatalog()
+                .addPageNumber()
         ;
 
         reportBuilder.build();

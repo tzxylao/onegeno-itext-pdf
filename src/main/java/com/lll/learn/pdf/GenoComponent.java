@@ -16,11 +16,13 @@ public class GenoComponent {
     public static Paragraph getCatelogDottedLine(int type) {
         Paragraph element;
         if (type == 1) {
-            element = new Paragraph("-----------------------------------------------------------------------------------------------");
-        } else {
             element = new Paragraph("------------------------------------------------------------------------");
+        } else {
+            element = new Paragraph("------------------------------------------------");
         }
         element.setProperty(Property.OVERFLOW_X, OverflowPropertyValue.HIDDEN);
+        element.setTextAlignment(TextAlignment.RIGHT);
+        element.setMarginRight(20);
         return element;
     }
 
@@ -65,7 +67,7 @@ public class GenoComponent {
     }
 
     public static Paragraph getTitleParagraph(Text context){
-        return new Paragraph(context).setMargin(-2);
+        return new Paragraph(context).setMargin(0);
     }
 
 }
