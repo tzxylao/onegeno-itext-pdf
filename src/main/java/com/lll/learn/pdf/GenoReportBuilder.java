@@ -822,9 +822,6 @@ public class GenoReportBuilder extends ReportBuilder {
             pdf.movePage(numberOfPages, startPage);
         }
         String forbidPage = properties.getProperty("forbidPage");
-        System.out.println("catalogSize:" + catalogSize);
-        System.out.println("forbidPage:" + forbidPage);
-        System.out.println("numberOfPages:" + numberOfPages);
         for (int pageNumber = 1; pageNumber < numberOfPages + 1; pageNumber++) {
 
             if (pageNumber > 6 + catalogSize && pageNumber != 8 + catalogSize) {

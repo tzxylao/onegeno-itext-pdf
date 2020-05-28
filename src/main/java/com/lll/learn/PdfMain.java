@@ -42,7 +42,6 @@ public class PdfMain {
             });
         }
 
-
         PrintReportBean data = reportBeanResult.getData();
         reportBuilder.setPrintReportBean(data);
         reportBuilder
