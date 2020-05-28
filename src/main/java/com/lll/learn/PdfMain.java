@@ -29,7 +29,7 @@ public class PdfMain {
         // 获取真实数据
         int selected = 0;
         Result<PrintReportBean> reportBeanResult;
-        if (selected == 0) {
+        if (selected == 1) {
             HttpRequest request = HttpUtil.createPost(
                     "http://result.dev.1genehealth.com/api/v1/biology/bio/report/print?access_token=0e7ad759-f724-4780-b549-24fea237c561&uuid=5f60026ec7f1417a81be90d571415389&mold=&type=1");
             HttpResponse execute = request.execute();

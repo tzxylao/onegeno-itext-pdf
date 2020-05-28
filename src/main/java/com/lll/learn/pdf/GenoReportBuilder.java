@@ -443,21 +443,43 @@ public class GenoReportBuilder extends ReportBuilder {
                     break;
                 case 2:
                     p2.add("。在相同外界条件下，您与大多数人的患病风险相同。基因风险相同情况下，最终患病与否，与外界环境、生活习惯和医疗条件的差异密切相关。因此，仍建议您重视预防" + itemsBean.getName() + "，注意规避外界风险因素，保持良好的生活习惯，加强锻炼，定期进行体检和相关筛查。");
+                    break;
                 case 3:
                     p2.add("。在相同外界条件下，您患" + itemsBean.getName() + "的风险比正常人群稍高。建议您尽可能规避相关高危因素、调整生活习惯，改变不利的生活方式，定期进行体检和相关筛查，认真对待相关急慢性疾病（如发生）的治疗和医疗干预。");
+                    break;
                 case 4:
                     p2.add("。在相同外界条件下，您患" + itemsBean.getName() + "的风险高于正常人群。建议您尽可能规避" + itemsBean.getName() + "相关高危因素、调整生活习惯，改变不利的生活方式，定期进行体检和相关筛查，认真对待相关急慢性疾病（如发生）的治疗和医疗干预。");
+                    break;
                 default:
                     break;
             }
             doc.add(p2);
         }
 
-        // TODO 遗传病不知道样式
+        // 遗传病
         if ("ycb".equals(categoryCode)) {
+            Div checkDiv = new Div();
+            Paragraph p3 = new Paragraph();
+            p3.add(new Text(itemsBean.getLabel() + "\n").addStyle(GenoStyle.getTitleStyle()));
             if ("未检出".equals(itemsBean.getLabel())) {
-
+                p3.setBorder(new SolidBorder(GenoColor.getThemeColor(), 3));
+            } else if ("携带".equals(itemsBean.getLabel())) {
+                p3.setBorder(new SolidBorder(GenoColor.getOrangeColor(), 3));
+            } else if ("携带".equals(itemsBean.getLabel())) {
+                p3.setBorder(new SolidBorder(GenoColor.getRedColor(), 3));
             }
+            p3.setTextAlignment(TextAlignment.CENTER);
+            p3.setWidth(200);
+            p3.setHorizontalAlignment(HorizontalAlignment.CENTER);
+            checkDiv.add(p3);
+
+            Paragraph p4 = new Paragraph();
+            p4.add(new Text("检出:检出致病突变且为致病基因型\n"));
+            p4.add(new Text("携带:携带致病突变但为非致病基因型\n"));
+            p4.add(new Text("未检出：未检出致病突变"));
+            p4.setTextAlignment(TextAlignment.CENTER);
+            checkDiv.add(p4);
+            doc.add(checkDiv);
         }
         // 维生素矿物质
         boolean wssFlag = "wss".equals(categoryCode) || "kwz".equals(categoryCode);
@@ -493,7 +515,6 @@ public class GenoReportBuilder extends ReportBuilder {
         doc.add(geneLocusTable);
 
         // 简介，症状，健康建议，基因解读
-        long count = contents.stream().filter(content -> "健康建议".equals(content.getLabel())).count();
         for (ReportBean.ItemsBean.ContentsBean content : contents) {
             if (content.getLabel().contains("线上") || content.getLabel().contains("卡路里表") ||
                     content.getLabel().contains("减肥建议") || content.getLabel().contains("饮食护理") || content.getLabel().contains("外部护理")) {
@@ -601,7 +622,7 @@ public class GenoReportBuilder extends ReportBuilder {
             }
             itemsBean.setContents(result);
             result.add(contentsBeans.get(contentsBeans.size() - 1));
-        }else{
+        } else {
             for (ReportBean.ItemsBean.ContentsBean content : contents) {
                 if (content.getLabel().contains("线下")) {
                     content.setLabel(content.getLabel().split("-")[0]);
@@ -721,7 +742,7 @@ public class GenoReportBuilder extends ReportBuilder {
         tableCatalog.startNewRow();
         Paragraph p1 = new Paragraph();
         p1.add(new Text("目录").addStyle(GenoStyle.getTitleStyle()).setFontSize(32));
-        java.util.List<CataLog> cataLogs = cataLogsMap.get(ExtraParam.CatalogType.ATTENTION);
+        java.util.List<CataLog> cataLogs = cataLogsMap.getOrDefault(ExtraParam.CatalogType.ATTENTION, new LinkedList<>());
         // 需要注意 动态变化
         tableCatalog.addCell(GenoComponent.getCatelogCell().add(new Paragraph("需要注意").addStyle(GenoStyle.getSecondTitleStyle())));
         tableCatalog.startNewRow();
@@ -729,7 +750,7 @@ public class GenoReportBuilder extends ReportBuilder {
         //添加具体目录明细
         this.addCatalogDetail(offPage, tableCatalog, cataLogs);
 
-        cataLogs = cataLogsMap.get(ExtraParam.CatalogType.NORMAL);
+        cataLogs = cataLogsMap.getOrDefault(ExtraParam.CatalogType.NORMAL, new LinkedList<>());
         // 正常项目 动态变化
         tableCatalog.addCell(GenoComponent.getCatelogCell().add(new Paragraph("正常项目").addStyle(GenoStyle.getSecondTitleStyle())));
         tableCatalog.startNewRow();
