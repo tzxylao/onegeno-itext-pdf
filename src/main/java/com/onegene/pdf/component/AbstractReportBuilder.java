@@ -38,7 +38,6 @@ public abstract class AbstractReportBuilder implements IReportBuilder {
     @Setter
     @Getter
     protected Integer part = 0;
-    @Setter
     protected String fontPath;
     protected PrintReportBean reportBean;
     protected ConverterProperties proper;
@@ -49,12 +48,21 @@ public abstract class AbstractReportBuilder implements IReportBuilder {
         this.reportBean = printReportBean;
     }
 
+    public void setFontPath(String fontPath) {
+        this.fontPath = fontPath;
+        File file = new File(fontPath);
+        if (!file.exists()) {
+            file.mkdirs();
+        }
+    }
+
     public void initPdf(String outPath, Integer part) throws IOException {
         this.part = part;
         initPdf(outPath);
     }
 
     public void initPdf(String outPath) {
+        this.generateDirectory(outPath);
         this.outPath = outPath;
         String inPath = outPath;
         if (part <= 0) {
@@ -95,6 +103,14 @@ public abstract class AbstractReportBuilder implements IReportBuilder {
         }
         FontProvider fontProvider = new FontProvider(fontSet);
         proper.setFontProvider(fontProvider);
+    }
+
+    private void generateDirectory(String outPath) {
+        String directory = outPath.substring(0,outPath.lastIndexOf("/"));
+        File file = new File(directory);
+        if (!file.exists()) {
+            file.mkdirs();
+        }
     }
 
     protected String getInPath() {

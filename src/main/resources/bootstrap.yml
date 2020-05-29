@@ -1,6 +1,6 @@
 spring:
   application:
-    name: component
+    name: pdf
   cloud:
     config:
       fail-fast: true

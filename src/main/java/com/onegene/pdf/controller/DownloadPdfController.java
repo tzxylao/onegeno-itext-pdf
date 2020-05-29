@@ -3,6 +3,8 @@ package com.onegene.pdf.controller;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.http.HttpUtil;
+import cn.hutool.system.HostInfo;
+import cn.hutool.system.SystemUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.onegene.pdf.component.GenoReportBuilder;
@@ -20,6 +22,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.util.StopWatch;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
@@ -50,6 +53,16 @@ public class DownloadPdfController {
     @Value("${onegene.pdf.prefix:/Users/laoliangliang/Desktop/}")
     private String prefixPath;
 
+    @PostConstruct
+    public void init(){
+        HostInfo hostInfo = SystemUtil.getHostInfo();
+        String name = hostInfo.getName();
+        if ("laoliangliangdeMacBook-Pro.local".equals(name)) {
+            fontPath = "/Users/laoliangliang" + fontPath;
+            prefixPath = "/Users/laoliangliang" + prefixPath;
+        }
+    }
+
     @RequestMapping(value = "/download", method = RequestMethod.GET)
     public void downLoad(@RequestParam("access_token") String token, @RequestParam("uuid") String uuid, @RequestParam(value = "part", defaultValue = "0") Integer part, HttpServletResponse response) throws IOException {
         StopWatch stopWatch = new StopWatch();
@@ -58,6 +71,10 @@ public class DownloadPdfController {
         PrintReportBean data = getPrintReportBean(token, uuid);
         if (data == null) {
             return;
+        }
+        File prefixPathFile = new File(prefixPath);
+        if (!prefixPathFile.exists()) {
+            prefixPathFile.mkdirs();
         }
         // 构建PDF
         String outPath = prefixPath + uuid + ".pdf";
