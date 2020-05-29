@@ -1,11 +1,19 @@
 package com.lll.learn.pdf;
 
+import com.lll.learn.pdf.entity.PrintReportBean;
+
 /**
  * @author: laoliangliang
  * @description:
  * @create: 2020/5/29 11:20
  **/
 public interface IReportBuilder {
+
+    /**
+     * 通过代理调用
+     */
+    void invokePartProxy(PrintReportBean data);
+
     /**
      * 添加首页图片
      */

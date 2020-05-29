@@ -44,20 +44,7 @@ public class PdfMain {
 
         PrintReportBean data = reportBeanResult.getData();
         reportBuilder.setPrintReportBean(data);
-        reportBuilder
-                .addIndex()
-                .addHello()
-                .addExaminee()
-                .addDetectionContent()
-                .addResultSummary()
-                .addContext()
-                .addThanks()
-                .addBackCover()
-                .addCatalog()
-                .addPageNumber()
-        ;
-
-        reportBuilder.build();
+        reportBuilder.buildAll(data);
         stopWatch.stop();
         System.out.println(stopWatch.getTotalTimeMillis() + "ms");
     }

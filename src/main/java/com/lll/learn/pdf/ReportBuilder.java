@@ -17,6 +17,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -27,15 +28,15 @@ import java.util.Properties;
  * @description:
  * @create: 2020/5/19 17:40
  **/
-public abstract class ReportBuilder implements IReportBuilder{
+public abstract class ReportBuilder implements IReportBuilder {
 
     protected PdfWriter writer;
     protected PdfDocument pdf;
     protected Document doc;
     protected PdfFont font;
     protected String outPath;
-    @Getter
     @Setter
+    @Getter
     protected Integer part = 0;
     protected PrintReportBean reportBean;
     protected ConverterProperties proper;
@@ -46,19 +47,32 @@ public abstract class ReportBuilder implements IReportBuilder{
         this.reportBean = printReportBean;
     }
 
-    public void initPdf(String outPath) throws IOException {
+    public void initPdf(String outPath, Integer part) throws IOException {
+        this.part = part;
+        initPdf(outPath);
+    }
+
+    public void initPdf(String outPath) {
         this.outPath = outPath;
         String inPath = outPath;
         if (part <= 0) {
             inPath = getInPath();
         }
-        writer = new PdfWriter(new File(inPath));
+        try {
+            writer = new PdfWriter(new File(inPath));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
         pdf = new PdfDocument(writer);
         pdf.setDefaultPageSize(PageSize.A4);
         pdf.getDefaultPageSize().applyMargins(0, 0, 0, 0, true);
 
 //        PdfFont font = PdfFontFactory.createFont("STSong-Light", "UniGB-UCS2-H", true);
-        font = PdfFontFactory.createFont(ReportBuilder.class.getClassLoader().getResource("font/SourceHanSansCN-Regular.ttf").getPath(), PdfEncodings.IDENTITY_H, true);
+        try {
+            font = PdfFontFactory.createFont(ReportBuilder.class.getClassLoader().getResource("font/SourceHanSansCN-Regular.ttf").getPath(), PdfEncodings.IDENTITY_H, true);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         doc = new Document(pdf);
         doc.setMargins(50, 60, 50, 60);
         doc.setFont(font);
@@ -81,6 +95,12 @@ public abstract class ReportBuilder implements IReportBuilder{
         String name = split[0];
         return prefix + name + "_temp.pdf";
     }
+
+    /**
+     * 通过代理调用
+     */
+    @Override
+    public abstract void invokePartProxy(PrintReportBean data);
 
     @Data
     @AllArgsConstructor

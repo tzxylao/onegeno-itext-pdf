@@ -17,6 +17,7 @@ import com.itextpdf.layout.borders.SolidBorder;
 import com.itextpdf.layout.element.*;
 import com.itextpdf.layout.element.List;
 import com.itextpdf.layout.property.*;
+import com.lll.learn.pdf.entity.PrintReportBean;
 import com.lll.learn.pdf.entity.ReportBean;
 import com.lll.learn.pdf.event.CatalogMoveEvent;
 import com.lll.learn.pdf.event.HeaderTextEvent;
@@ -25,6 +26,8 @@ import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Proxy;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -40,8 +43,22 @@ import java.util.stream.Collectors;
 public class GenoReportBuilder extends ReportBuilder {
 
     @Override
-    public void initPdf(String outPath) throws IOException {
-        super.initPdf(outPath);
+    public void invokePartProxy(PrintReportBean data) {
+        this.reportBean = data;
+        InvocationHandler genoReportProxy = new GenoReportProxy(this);
+        IReportBuilder proxy = (IReportBuilder) Proxy.newProxyInstance(genoReportProxy.getClass().getClassLoader(), ReportBuilder.class.getInterfaces(), genoReportProxy);
+
+        proxy.addIndex();
+        proxy.addHello();
+        proxy.addExaminee();
+        proxy.addDetectionContent();
+        proxy.addResultSummary();
+        proxy.addContext();
+        proxy.addThanks();
+        proxy.addBackCover();
+        proxy.addCatalog();
+        proxy.addPageNumber();
+        this.build();
     }
 
     @Override
@@ -261,7 +278,6 @@ public class GenoReportBuilder extends ReportBuilder {
             tabDiv.add(element);
             t1.addCell(GenoComponent.getDefaultCell().add(tabDiv));
         }
-
 
         Paragraph p2 = new Paragraph();
         p2.setFixedPosition(60, 90, UnitValue.createPercentValue(110));
