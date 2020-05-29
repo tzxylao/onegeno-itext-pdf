@@ -71,7 +71,7 @@ public abstract class AbstractReportBuilder implements IReportBuilder {
 
 //        PdfFont font = PdfFontFactory.createFont("STSong-Light", "UniGB-UCS2-H", true);
         try {
-            if (fontPath != null) {
+            if (fontPath == null) {
                 font = PdfFontFactory.createFont(AbstractReportBuilder.class.getClassLoader().getResource("font/SourceHanSansCN-Regular.ttf").getPath(), PdfEncodings.IDENTITY_H, true);
             } else {
                 font = PdfFontFactory.createFont(fontPath, PdfEncodings.IDENTITY_H, true);
