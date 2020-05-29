@@ -1,4 +1,4 @@
-package com.lll.learn.data;
+package com.lll.learn.pdf.entity;
 
 /**
  * @author: laoliangliang

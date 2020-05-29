@@ -1,4 +1,4 @@
-package com.lll.learn.data;
+package com.lll.learn.pdf.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;

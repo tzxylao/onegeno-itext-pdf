@@ -1,4 +1,4 @@
-package com.lll.learn.data;
+package com.lll.learn.pdf.entity;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

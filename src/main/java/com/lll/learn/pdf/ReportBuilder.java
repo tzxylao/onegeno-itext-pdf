@@ -16,7 +16,7 @@ import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.font.FontProvider;
 import com.itextpdf.layout.font.FontSet;
-import com.lll.learn.data.PrintReportBean;
+import com.lll.learn.pdf.entity.PrintReportBean;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -42,7 +42,6 @@ public abstract class ReportBuilder {
     protected ConverterProperties proper;
     protected Map<GenoReportBuilder.ExtraParam.CatalogType, java.util.List<GenoReportBuilder.CataLog>> cataLogsMap = new LinkedHashMap<>();
     protected Properties properties = new Properties();
-
 
     public void setPrintReportBean(PrintReportBean printReportBean) {
         this.reportBean = printReportBean;
@@ -147,6 +146,11 @@ public abstract class ReportBuilder {
         }
     }
 
+    /**
+     * 一键构建
+     * @return
+     */
+    public abstract ReportBuilder buildAll(PrintReportBean data);
     /**
      * 添加首页图片
      */

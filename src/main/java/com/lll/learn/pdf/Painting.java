@@ -15,7 +15,7 @@ import com.itextpdf.kernel.pdf.PdfPage;
 import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
 import com.itextpdf.layout.Canvas;
 import com.itextpdf.layout.element.Image;
-import com.lll.learn.data.ReportBean;
+import com.lll.learn.pdf.entity.ReportBean;
 import lombok.Data;
 
 import java.io.IOException;

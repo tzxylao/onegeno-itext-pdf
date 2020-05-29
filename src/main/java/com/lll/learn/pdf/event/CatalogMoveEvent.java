@@ -31,8 +31,6 @@ public class CatalogMoveEvent implements IEventHandler {
         PdfDocumentEvent docEvent = (PdfDocumentEvent) event;
         PdfDocument pdfDoc = docEvent.getDocument();
         PdfPage page = docEvent.getPage();
-        int pageNumber = pdfDoc.getPageNumber(page);
-//        pdfDoc.movePage(pageNumber, startPage++);
         pageSize++;
         properties.setProperty("catalogSize", pageSize + "");
     }
