@@ -17,7 +17,6 @@ import com.itextpdf.layout.borders.SolidBorder;
 import com.itextpdf.layout.element.*;
 import com.itextpdf.layout.element.List;
 import com.itextpdf.layout.property.*;
-import com.lll.learn.pdf.entity.PrintReportBean;
 import com.lll.learn.pdf.entity.ReportBean;
 import com.lll.learn.pdf.event.CatalogMoveEvent;
 import com.lll.learn.pdf.event.HeaderTextEvent;
@@ -43,23 +42,6 @@ public class GenoReportBuilder extends ReportBuilder {
     @Override
     public void initPdf(String outPath) throws IOException {
         super.initPdf(outPath);
-    }
-
-    @Override
-    public ReportBuilder buildAll(PrintReportBean data) {
-        this.reportBean = data;
-        this
-                .addIndex()
-                .addHello()
-                .addExaminee()
-                .addDetectionContent()
-                .addResultSummary()
-                .addContext()
-                .addThanks()
-                .addBackCover()
-                .addCatalog()
-                .addPageNumber();
-        return this;
     }
 
     @Override
