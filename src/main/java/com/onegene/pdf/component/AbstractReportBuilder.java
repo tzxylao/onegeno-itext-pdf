@@ -88,7 +88,11 @@ public abstract class AbstractReportBuilder implements IReportBuilder {
         proper = new ConverterProperties();
         //字体设置，解决中文不显示问题
         FontSet fontSet = new FontSet();
-        fontSet.addFont(GenoReportBuilder.class.getClassLoader().getResource("font/SourceHanSansCN-Regular.ttf").getPath(), PdfEncodings.IDENTITY_H);
+        if (fontPath == null) {
+            fontSet.addFont(GenoReportBuilder.class.getClassLoader().getResource("font/SourceHanSansCN-Regular.ttf").getPath(), PdfEncodings.IDENTITY_H);
+        } else {
+            fontSet.addFont(fontPath, PdfEncodings.IDENTITY_H);
+        }
         FontProvider fontProvider = new FontProvider(fontSet);
         proper.setFontProvider(fontProvider);
     }
