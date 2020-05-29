@@ -1,6 +1,5 @@
 package com.onegene.pdf.component;
 
-import com.itextpdf.io.font.PdfEncodings;
 import com.itextpdf.io.font.constants.StandardFonts;
 import com.itextpdf.io.image.ImageDataFactory;
 import com.itextpdf.kernel.colors.Color;
@@ -33,16 +32,12 @@ public class Painting {
     private PdfDocument pdf;
     private PdfFont font;
 
-    public Painting(PdfDocument pdf) {
+    public Painting(PdfDocument pdf,PdfFont font) {
         this.pdf = pdf;
+        this.font = font;
         PdfPage page = pdf.getPage(pdf.getNumberOfPages());
         pageSize = pdf.getDefaultPageSize();
         pdfCanvas = new PdfCanvas(page);
-        try {
-            font = PdfFontFactory.createFont(AbstractReportBuilder.class.getClassLoader().getResource("font/SourceHanSansCN-Regular.ttf").getPath(), PdfEncodings.IDENTITY_H, true);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     public void drawHeader() {

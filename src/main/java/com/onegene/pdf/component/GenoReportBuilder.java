@@ -14,8 +14,8 @@ import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.Style;
 import com.itextpdf.layout.borders.SolidBorder;
-import com.itextpdf.layout.element.*;
 import com.itextpdf.layout.element.List;
+import com.itextpdf.layout.element.*;
 import com.itextpdf.layout.property.*;
 import com.onegene.pdf.component.entity.PrintReportBean;
 import com.onegene.pdf.component.entity.ReportBean;
@@ -106,7 +106,7 @@ public class GenoReportBuilder extends AbstractReportBuilder {
         div.add(p1);
 
 
-        Painting painting = new Painting(pdf);
+        Painting painting = new Painting(pdf, font);
         painting.drawHello("image/纸质报告-03.png");
         painting.close();
 
@@ -294,7 +294,7 @@ public class GenoReportBuilder extends AbstractReportBuilder {
         doc.add(t1);
         doc.add(p2);
 
-        Painting painting = new Painting(pdf);
+        Painting painting = new Painting(pdf, font);
         painting.drawHeader();
         painting.close();
 
@@ -368,7 +368,7 @@ public class GenoReportBuilder extends AbstractReportBuilder {
         java.util.List<ReportBean.ItemsBean.ContentsBean> contents = this.handlerContents(itemsBean);
         java.util.List<ReportBean.ItemsBean.LiteraturesBean> literatures = itemsBean.getLiteratures();
 
-        HeaderTextEvent headerTextEvent = new HeaderTextEvent(title);
+        HeaderTextEvent headerTextEvent = new HeaderTextEvent(title, font);
         pdf.addEventHandler(PdfDocumentEvent.START_PAGE, headerTextEvent);
 
         doc.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
@@ -385,7 +385,7 @@ public class GenoReportBuilder extends AbstractReportBuilder {
         p1.add(GenoComponent.getSecondTitle("检测结果"));
         doc.add(p1);
 
-        Painting painting = new Painting(pdf);
+        Painting painting = new Painting(pdf, font);
 
         String categoryCode = itemsBean.getCategoryCode();
         boolean gaoLevelFlag = "cjzl".equals(categoryCode) || "xhxt".equals(categoryCode) || "cs".equals(categoryCode) || "jsxl".equals(categoryCode) || "ln".equals(categoryCode) || "nfm".equals(categoryCode) || "xnxg".equals(categoryCode) || "zsmy".equals(categoryCode);
