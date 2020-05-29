@@ -44,6 +44,9 @@ public class DownloadPdfController {
     @Value("${onegene.biology.print.url:http://infoapi.1genehealth.com/biology/bio/report/print}")
     private String url;
 
+    @Value("${onegene.pdf.prefix:/Users/laoliangliang/Desktop/}")
+    private String prefixPath;
+
     @RequestMapping(value = "/download", method = RequestMethod.GET)
     public void downLoad(@RequestParam("access_token") String token, @RequestParam("uuid") String uuid, @RequestParam(value = "part", defaultValue = "0") Integer part, HttpServletResponse response) throws IOException {
         StopWatch stopWatch = new StopWatch();
@@ -54,7 +57,7 @@ public class DownloadPdfController {
             return;
         }
         // 构建PDF
-        String outPath = "/Users/laoliangliang/Desktop/" + uuid + ".pdf";
+        String outPath = prefixPath + uuid + ".pdf";
         GenoReportBuilder builder = new GenoReportBuilder();
         builder.initPdf(outPath, part);
 
@@ -116,7 +119,7 @@ public class DownloadPdfController {
                 }
 
                 GenoReportBuilder builder = new GenoReportBuilder();
-                builder.initPdf("/Users/laoliangliang/Desktop/" + DateUtil.format(new Date(), "yyyyMMdd") + "/" + sampleResult.toString() + ".pdf");
+                builder.initPdf(prefixPath + DateUtil.format(new Date(), "yyyyMMdd") + "/" + sampleResult.toString() + ".pdf");
                 builder.buildAll(data);
                 watch.stop();
                 log.info(uuid + ",耗时：" + watch.getTotalTimeMillis() + "ms");
