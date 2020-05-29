@@ -17,17 +17,17 @@ public interface IReportBuilder {
     /**
      * 添加首页图片
      */
-    ReportBuilder addIndex();
+    AbstractReportBuilder addIndex();
 
     /**
      * say hello
      */
-    ReportBuilder addHello();
+    AbstractReportBuilder addHello();
 
     /**
      * 添加受检人信息
      */
-    ReportBuilder addExaminee();
+    AbstractReportBuilder addExaminee();
 
     /**
      * 添加检测内容

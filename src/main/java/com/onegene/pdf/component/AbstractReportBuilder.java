@@ -28,7 +28,7 @@ import java.util.Properties;
  * @description:
  * @create: 2020/5/19 17:40
  **/
-public abstract class ReportBuilder implements IReportBuilder {
+public abstract class AbstractReportBuilder implements IReportBuilder {
 
     protected PdfWriter writer;
     protected PdfDocument pdf;
@@ -38,6 +38,8 @@ public abstract class ReportBuilder implements IReportBuilder {
     @Setter
     @Getter
     protected Integer part = 0;
+    @Setter
+    protected String fontPath;
     protected PrintReportBean reportBean;
     protected ConverterProperties proper;
     protected Map<GenoReportBuilder.ExtraParam.CatalogType, java.util.List<GenoReportBuilder.CataLog>> cataLogsMap = new LinkedHashMap<>();
@@ -69,7 +71,11 @@ public abstract class ReportBuilder implements IReportBuilder {
 
 //        PdfFont font = PdfFontFactory.createFont("STSong-Light", "UniGB-UCS2-H", true);
         try {
-            font = PdfFontFactory.createFont(ReportBuilder.class.getClassLoader().getResource("font/SourceHanSansCN-Regular.ttf").getPath(), PdfEncodings.IDENTITY_H, true);
+            if (fontPath != null) {
+                font = PdfFontFactory.createFont(AbstractReportBuilder.class.getClassLoader().getResource("font/SourceHanSansCN-Regular.ttf").getPath(), PdfEncodings.IDENTITY_H, true);
+            } else {
+                font = PdfFontFactory.createFont(fontPath, PdfEncodings.IDENTITY_H, true);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -118,7 +124,7 @@ public abstract class ReportBuilder implements IReportBuilder {
      *
      * @return
      */
-    public ReportBuilder buildAll(PrintReportBean data) {
+    public AbstractReportBuilder buildAll(PrintReportBean data) {
         this.reportBean = data;
         addIndex();
         addHello();
@@ -138,19 +144,19 @@ public abstract class ReportBuilder implements IReportBuilder {
      * 添加首页图片
      */
     @Override
-    public abstract ReportBuilder addIndex();
+    public abstract AbstractReportBuilder addIndex();
 
     /**
      * say hello
      */
     @Override
-    public abstract ReportBuilder addHello();
+    public abstract AbstractReportBuilder addHello();
 
     /**
      * 添加受检人信息
      */
     @Override
-    public abstract ReportBuilder addExaminee();
+    public abstract AbstractReportBuilder addExaminee();
 
     public void build() {
         try {

@@ -13,7 +13,7 @@ import com.itextpdf.layout.Document;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.property.TextAlignment;
 import com.itextpdf.layout.property.VerticalAlignment;
-import com.onegene.pdf.component.ReportBuilder;
+import com.onegene.pdf.component.AbstractReportBuilder;
 import org.junit.jupiter.api.Test;
 import org.springframework.util.StopWatch;
 
@@ -24,7 +24,7 @@ class LearnApplicationTests {
 
     @Test
     void contextLoads() throws IOException {
-        PdfFont font = PdfFontFactory.createFont(ReportBuilder.class.getClassLoader().getResource("font/SourceHanSansCN-Regular.ttf").getPath(), PdfEncodings.IDENTITY_H, true);
+        PdfFont font = PdfFontFactory.createFont(AbstractReportBuilder.class.getClassLoader().getResource("font/SourceHanSansCN-Regular.ttf").getPath(), PdfEncodings.IDENTITY_H, true);
 
         String outPath = "/Users/laoliangliang/Desktop/report2.pdf";
         StopWatch stopWatch = new StopWatch();
@@ -58,7 +58,7 @@ class LearnApplicationTests {
 
     @Test
     public void test2() throws IOException {
-        PdfFont font = PdfFontFactory.createFont(ReportBuilder.class.getClassLoader().getResource("font/SourceHanSansCN-Regular.ttf").getPath(), PdfEncodings.IDENTITY_H, true);
+        PdfFont font = PdfFontFactory.createFont(AbstractReportBuilder.class.getClassLoader().getResource("font/SourceHanSansCN-Regular.ttf").getPath(), PdfEncodings.IDENTITY_H, true);
 
         String outPath = "/Users/laoliangliang/Desktop/report3.pdf";
         StopWatch stopWatch = new StopWatch();

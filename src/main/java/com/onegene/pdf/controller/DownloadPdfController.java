@@ -41,6 +41,9 @@ public class DownloadPdfController {
     @Autowired
     private SampleMapper sampleMapper;
 
+    @Value("${onegene.font.path}")
+    private String fontPath;
+
     @Value("${onegene.biology.print.url:http://infoapi.1genehealth.com/biology/bio/report/print}")
     private String url;
 
@@ -59,6 +62,7 @@ public class DownloadPdfController {
         // 构建PDF
         String outPath = prefixPath + uuid + ".pdf";
         GenoReportBuilder builder = new GenoReportBuilder();
+        builder.setFontPath(fontPath);
         builder.initPdf(outPath, part);
 
         if (part == 0) {
@@ -119,6 +123,7 @@ public class DownloadPdfController {
                 }
 
                 GenoReportBuilder builder = new GenoReportBuilder();
+                builder.setFontPath(fontPath);
                 builder.initPdf(prefixPath + DateUtil.format(new Date(), "yyyyMMdd") + "/" + sampleResult.toString() + ".pdf");
                 builder.buildAll(data);
                 watch.stop();

@@ -9,7 +9,7 @@ import com.alibaba.fastjson.TypeReference;
 import com.onegene.pdf.component.entity.PrintReportBean;
 import com.onegene.pdf.component.entity.Result;
 import com.onegene.pdf.component.GenoReportBuilder;
-import com.onegene.pdf.component.ReportBuilder;
+import com.onegene.pdf.component.AbstractReportBuilder;
 import org.springframework.util.StopWatch;
 
 import java.io.File;
@@ -24,8 +24,8 @@ public class PdfMain {
     public static void main(String[] args) throws IOException {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
-        ReportBuilder reportBuilder = new GenoReportBuilder();
-        reportBuilder.initPdf("/Users/laoliangliang/Desktop/report.component");
+        AbstractReportBuilder abstractReportBuilder = new GenoReportBuilder();
+        abstractReportBuilder.initPdf("/Users/laoliangliang/Desktop/report.pdf");
         // 获取真实数据
         int selected = 0;
         Result<PrintReportBean> reportBeanResult;
@@ -43,8 +43,8 @@ public class PdfMain {
         }
 
         PrintReportBean data = reportBeanResult.getData();
-        reportBuilder.setPrintReportBean(data);
-        reportBuilder.buildAll(data);
+        abstractReportBuilder.setPrintReportBean(data);
+        abstractReportBuilder.buildAll(data);
         stopWatch.stop();
         System.out.println(stopWatch.getTotalTimeMillis() + "ms");
     }

@@ -40,13 +40,13 @@ import java.util.stream.Collectors;
  * @description:
  * @create: 2020/5/20 8:34
  **/
-public class GenoReportBuilder extends ReportBuilder {
+public class GenoReportBuilder extends AbstractReportBuilder {
 
     @Override
     public void invokePartProxy(PrintReportBean data) {
         this.reportBean = data;
         InvocationHandler genoReportProxy = new GenoReportProxy(this);
-        IReportBuilder proxy = (IReportBuilder) Proxy.newProxyInstance(genoReportProxy.getClass().getClassLoader(), ReportBuilder.class.getInterfaces(), genoReportProxy);
+        IReportBuilder proxy = (IReportBuilder) Proxy.newProxyInstance(genoReportProxy.getClass().getClassLoader(), AbstractReportBuilder.class.getInterfaces(), genoReportProxy);
 
         proxy.addIndex();
         proxy.addHello();
@@ -115,7 +115,7 @@ public class GenoReportBuilder extends ReportBuilder {
     }
 
     @Override
-    public ReportBuilder addExaminee() {
+    public AbstractReportBuilder addExaminee() {
         ReportBean.IndexBean index = reportBean.getIndex();
 
         doc.add(new AreaBreak(AreaBreakType.NEXT_PAGE));

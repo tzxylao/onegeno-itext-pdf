@@ -39,7 +39,7 @@ public class Painting {
         pageSize = pdf.getDefaultPageSize();
         pdfCanvas = new PdfCanvas(page);
         try {
-            font = PdfFontFactory.createFont(ReportBuilder.class.getClassLoader().getResource("font/SourceHanSansCN-Regular.ttf").getPath(), PdfEncodings.IDENTITY_H, true);
+            font = PdfFontFactory.createFont(AbstractReportBuilder.class.getClassLoader().getResource("font/SourceHanSansCN-Regular.ttf").getPath(), PdfEncodings.IDENTITY_H, true);
         } catch (IOException e) {
             e.printStackTrace();
         }
