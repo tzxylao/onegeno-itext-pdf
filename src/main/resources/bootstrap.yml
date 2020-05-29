@@ -9,3 +9,5 @@ spring:
       uri: http://config.dev.1genehealth.com:30908
   profiles:
     active: pro
+server:
+  port: 8847
