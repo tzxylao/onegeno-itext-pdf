@@ -10,6 +10,7 @@ import com.itextpdf.kernel.pdf.PdfReader;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
 import com.itextpdf.layout.Document;
+import com.itextpdf.layout.borders.SolidBorder;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.property.TextAlignment;
 import com.itextpdf.layout.property.VerticalAlignment;
@@ -71,17 +72,16 @@ class LearnApplicationTests {
 
 
         Document document = new Document(pdf, pageSize);
-
+        document.setBorder(new SolidBorder(1));
+        document.setMargins(0, 0, 0, 0);
         document.setFont(font);
-        PdfCanvas pdfCanvas = new PdfCanvas(pdf.getPage(pdf.getNumberOfPages()));
-        pdfCanvas.saveState()
-                .moveTo(pageSize.getWidth()/2-200,pageSize.getTop()-30)
-                .lineTo(pageSize.getWidth()/2-100,pageSize.getTop()-30)
-                .stroke()
-                .restoreState();
-
-        document.add(new Paragraph("hello 你好"));
-
+        for (int i = 0; i < 73; i++) {
+            document.add(new Paragraph("哈哈哈").setMargin(0).setPadding(0));
+        }
+        document.add(new Paragraph("哈哈哈").setKeepWithNext(true).setBorder(new SolidBorder(1)));
+        System.out.println(pdf.getNumberOfPages());
+        document.add(new Paragraph("标题").setFontSize(22).setMargin(0).setPadding(0).setBorder(new SolidBorder(1)));
+        System.out.println(pdf.getNumberOfPages());
         pdf.close();
         stopWatch.stop();
         System.out.println(stopWatch.getTotalTimeMillis() + "ms");
