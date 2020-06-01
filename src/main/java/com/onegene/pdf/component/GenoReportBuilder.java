@@ -675,7 +675,7 @@ public class GenoReportBuilder extends AbstractReportBuilder {
     public GenoReportBuilder addThanks() {
         doc.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
 
-        properties.setProperty("forbidPage", pdf.getNumberOfPages() + "");
+        properties.setProperty(Constant.FORBIDDE, pdf.getNumberOfPages() + "");
 
         Paragraph p1 = new Paragraph();
         p1.setHorizontalAlignment(HorizontalAlignment.CENTER);
@@ -819,7 +819,7 @@ public class GenoReportBuilder extends AbstractReportBuilder {
 
     @Override
     public GenoReportBuilder addPageNumber() {
-        Integer catalogSize = Integer.parseInt(properties.getProperty("catalogSize"));
+        Integer catalogSize = Integer.parseInt(properties.getProperty(Constant.CATALOG_SIZE));
         pdf.close();
         PdfReader reader = null;
         PdfWriter writer = null;
@@ -837,7 +837,7 @@ public class GenoReportBuilder extends AbstractReportBuilder {
         for (int i = 0; i < catalogSize; i++) {
             pdf.movePage(numberOfPages, startPage);
         }
-        String forbidPage = properties.getProperty("forbidPage");
+        String forbidPage = properties.getProperty(Constant.FORBIDDE);
         for (int pageNumber = 1; pageNumber < numberOfPages + 1; pageNumber++) {
 
             if (pageNumber > 6 + catalogSize && pageNumber != 8 + catalogSize) {
