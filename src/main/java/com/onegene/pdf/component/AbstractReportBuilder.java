@@ -15,6 +15,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -28,6 +29,7 @@ import java.util.Properties;
  * @description:
  * @create: 2020/5/19 17:40
  **/
+@Slf4j
 public abstract class AbstractReportBuilder implements IReportBuilder {
 
     protected PdfWriter writer;
@@ -119,7 +121,7 @@ public abstract class AbstractReportBuilder implements IReportBuilder {
         String prefix = outPath.substring(0, index);
         String[] split = fileName.split("\\.");
         String name = split[0];
-        return prefix + name + "_temp.pdf";
+        return prefix + "/temp/" + name + "_temp.pdf";
     }
 
     /**
@@ -180,6 +182,7 @@ public abstract class AbstractReportBuilder implements IReportBuilder {
 
     public void build() {
         try {
+            log.info("输出目录：" + outPath);
             doc.close();
             pdf.close();
             pdf.close();

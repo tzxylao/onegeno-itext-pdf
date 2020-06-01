@@ -54,13 +54,16 @@ public class DownloadPdfController {
     private String prefixPath;
 
     @PostConstruct
-    public void init(){
+    public void init() {
         HostInfo hostInfo = SystemUtil.getHostInfo();
         String name = hostInfo.getName();
         if ("laoliangliangdeMacBook-Pro.local".equals(name)) {
             fontPath = "/Users/laoliangliang" + fontPath;
             prefixPath = "/Users/laoliangliang" + prefixPath;
         }
+
+        // 目标目录加个日期
+        prefixPath = prefixPath + DateUtil.format(new Date(), "yyyyMMdd") + "/";
     }
 
     @RequestMapping(value = "/download", method = RequestMethod.GET)
@@ -72,10 +75,9 @@ public class DownloadPdfController {
         if (data == null) {
             return;
         }
-        File prefixPathFile = new File(prefixPath);
-        if (!prefixPathFile.exists()) {
-            prefixPathFile.mkdirs();
-        }
+        // 若没有目录则创建
+        this.createDirectory();
+
         // 构建PDF
         String outPath = prefixPath + uuid + ".pdf";
         GenoReportBuilder builder = new GenoReportBuilder();
@@ -96,6 +98,18 @@ public class DownloadPdfController {
 
         stopWatch.stop();
         log.info("耗时：" + stopWatch.getTotalTimeMillis() + "ms");
+    }
+
+    private void createDirectory() {
+        File prefixPathFile = new File(prefixPath);
+        if (!prefixPathFile.exists()) {
+            File temp = new File(prefixPath + "temp/");
+            if (!temp.exists()) {
+                temp.mkdirs();
+            } else {
+                prefixPathFile.mkdirs();
+            }
+        }
     }
 
     private PrintReportBean getPrintReportBean(@RequestParam("access_token") String token, @RequestParam("uuid") String uuid) {
