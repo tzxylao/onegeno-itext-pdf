@@ -24,10 +24,12 @@ public class PdfMain {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         String prefix = "/Users/laoliangliang/Desktop/";
+        String fileName = "report.pdf";
+
         createDirectory(prefix);
 
         AbstractReportBuilder abstractReportBuilder = new GenoReportBuilder();
-        abstractReportBuilder.initPdf(prefix + "report.pdf");
+        abstractReportBuilder.initPdf(prefix + fileName);
         // 获取真实数据
         int selected = 0;
         Result<PrintReportBean> reportBeanResult;
