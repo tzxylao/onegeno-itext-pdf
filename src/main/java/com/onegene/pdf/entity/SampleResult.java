@@ -9,6 +9,7 @@ import lombok.Data;
  **/
 @Data
 public class SampleResult {
+    private Long id;
     private String channelName;
     private String barCode;
     /**

@@ -8,6 +8,6 @@ spring:
       name: application-infowork-pdf
       uri: http://config.dev.1genehealth.com:30908
   profiles:
-    active: pro
+    active: dev
 server:
   port: 8847

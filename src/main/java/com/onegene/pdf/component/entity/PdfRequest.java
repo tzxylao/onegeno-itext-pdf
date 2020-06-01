@@ -13,4 +13,8 @@ import java.util.List;
 public class PdfRequest {
     private List<String> uuids;
     private String token;
+    /**
+     * 为null或者1时，当判断样本已生成时跳过
+     */
+    private Integer skip;
 }

@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.onegene.pdf.mapper.SampleMapper">
     <select id="selectSampleResult" resultType="com.onegene.pdf.entity.SampleResult">
-        select a.`name`,a.bar_code,b.channel_name from sample a
+        select a.id,a.`name`,a.bar_code,b.channel_name from sample a
         join channel b on a.channel_id=b.id
         where a.uuid=#{uuid}
     </select>

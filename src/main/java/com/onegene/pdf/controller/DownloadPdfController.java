@@ -12,7 +12,9 @@ import com.onegene.pdf.component.entity.PdfRequest;
 import com.onegene.pdf.component.entity.PrintReportBean;
 import com.onegene.pdf.component.entity.Result;
 import com.onegene.pdf.entity.Sample;
+import com.onegene.pdf.entity.SampleExpand;
 import com.onegene.pdf.entity.SampleResult;
+import com.onegene.pdf.mapper.SampleExpandMapper;
 import com.onegene.pdf.mapper.SampleMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.util.StopWatch;
 import org.springframework.web.bind.annotation.*;
+import tk.mybatis.mapper.entity.Example;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletResponse;
@@ -44,6 +47,9 @@ public class DownloadPdfController {
     @Autowired
     private SampleMapper sampleMapper;
 
+    @Autowired
+    private SampleExpandMapper sampleExpandMapper;
+
     @Value("${onegene.font.path}")
     private String fontPath;
 
@@ -62,6 +68,7 @@ public class DownloadPdfController {
             prefixPath = "/Users/laoliangliang" + prefixPath;
         }
 
+        System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", "10");
         // 目标目录加个日期
         prefixPath = prefixPath + DateUtil.format(new Date(), "yyyyMMdd") + "/";
     }
@@ -129,37 +136,52 @@ public class DownloadPdfController {
 
     @RequestMapping(value = "/disk", method = RequestMethod.POST)
     @Async
-    public void saveToDisk(@RequestBody PdfRequest pdfRequest) {
-
+    public Result saveToDisk(@RequestBody PdfRequest pdfRequest) {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
-        CountDownLatch countDownLatch = new CountDownLatch(pdfRequest.getUuids().size());
-        System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", "10");
+        int size = pdfRequest.getUuids().size();
+        CountDownLatch countDownLatch = new CountDownLatch(size);
         pdfRequest.getUuids().parallelStream().forEach(uuid -> {
+            StopWatch watch = new StopWatch();
+            watch.start();
             try {
-                PrintReportBean data = getPrintReportBean(pdfRequest.getToken(), uuid);
-                if (data == null) {
-                    log.error("uuid:{} pdf数据不存在", uuid);
-                    return;
-                }
-                StopWatch watch = new StopWatch();
-                watch.start();
-
-                Sample sampleQuery = new Sample();
-                sampleQuery.setUuid(uuid);
-                SampleResult sampleResult = sampleMapper.selectSampleResult(sampleQuery);
+                SampleResult sampleResult = getSampleResult(uuid);
                 if (!sampleResult.vaild()) {
                     log.error("uuid:{},参数存在问题：{}", uuid, JSON.toJSONString(sampleResult));
                     return;
                 }
 
+                //判断不需要再生成则下一条
+                if (isOver(pdfRequest, sampleResult)) {
+                    log.info("跳过uuid:{}", uuid);
+                    return;
+                }
+
+                PrintReportBean data = getPrintReportBean(pdfRequest.getToken(), uuid);
+                if (data == null) {
+                    log.error("uuid:{} pdf数据不存在", uuid);
+                    return;
+                }
+
                 GenoReportBuilder builder = new GenoReportBuilder();
                 builder.setFontPath(fontPath);
-                builder.initPdf(prefixPath + DateUtil.format(new Date(), "yyyyMMdd") + "/" + sampleResult.toString() + ".pdf");
+                builder.initPdf(prefixPath + sampleResult.toString() + ".pdf");
                 builder.buildAll(data);
+                // pdf状态成功
+                updatePdfStateById(sampleResult.getId(), SampleExpand.PdfState.YES);
+
+            } catch (Exception e) {
+                log.info("未知异常：", e);
+                for (int i = 0; i < size; i++) {
+                    countDownLatch.countDown();
+                }
+
+                SampleResult sampleResult = getSampleResult(uuid);
+                // pdf状态失败
+                updatePdfStateById(sampleResult.getId(), SampleExpand.PdfState.FAIL);
+            } finally {
                 watch.stop();
                 log.info(uuid + ",耗时：" + watch.getTotalTimeMillis() + "ms");
-            } finally {
                 countDownLatch.countDown();
             }
         });
@@ -170,6 +192,31 @@ public class DownloadPdfController {
         }
         stopWatch.stop();
         log.info("总耗时：" + stopWatch.getTotalTimeMillis() + "ms");
+        return Result.ok("正在生成中，请耐心等待！");
+    }
+
+    private boolean isOver(@RequestBody PdfRequest pdfRequest, SampleResult sampleResult) {
+        SampleExpand sampleExpandQuery = new SampleExpand();
+        sampleExpandQuery.setSampleId(sampleResult.getId());
+        SampleExpand sampleExpand = sampleExpandMapper.selectOne(sampleExpandQuery);
+        return SampleExpand.PdfState.YES.val().equals(sampleExpand.getPdfState()) && (pdfRequest.getSkip() == null || pdfRequest.getSkip() == 1);
+    }
+
+    /**
+     * 修改pdf状态
+     */
+    private void updatePdfStateById(Long id, SampleExpand.PdfState pdfState) {
+        SampleExpand sampleExpandUpdate = new SampleExpand();
+        sampleExpandUpdate.setPdfState(pdfState.val());
+        Example example = new Example(SampleExpand.class);
+        example.createCriteria().andEqualTo("sampleId", id);
+        sampleExpandMapper.updateByExampleSelective(sampleExpandUpdate, example);
+    }
+
+    private SampleResult getSampleResult(String uuid) {
+        Sample sampleQuery = new Sample();
+        sampleQuery.setUuid(uuid);
+        return sampleMapper.selectSampleResult(sampleQuery);
     }
 
 }
