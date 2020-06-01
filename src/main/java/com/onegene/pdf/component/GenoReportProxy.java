@@ -1,5 +1,8 @@
 package com.onegene.pdf.component;
 
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.StopWatch;
+
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
@@ -8,7 +11,8 @@ import java.lang.reflect.Method;
  * @description:
  * @create: 2020/5/29 11:11
  **/
-public class GenoReportProxy implements InvocationHandler{
+@Slf4j
+public class GenoReportProxy implements InvocationHandler {
     private GenoReportBuilder builder;
 
     public GenoReportProxy(GenoReportBuilder builder) {
@@ -17,13 +21,19 @@ public class GenoReportProxy implements InvocationHandler{
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+
         String name = method.getName();
         if (name.startsWith("add")) {
             if (isStop()) {
                 return builder;
             }
         }
-        return method.invoke(builder, args);
+        Object invoke = method.invoke(builder, args);
+        stopWatch.stop();
+        log.info(method.getName() + "耗时：" + stopWatch.getTotalTimeMillis() + "ms");
+        return invoke;
     }
 
     private boolean isStop() {
@@ -31,7 +41,7 @@ public class GenoReportProxy implements InvocationHandler{
         if (part > 0) {
             part--;
             builder.setPart(part);
-        }else{
+        } else {
             builder.build();
             return true;
         }

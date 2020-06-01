@@ -67,7 +67,7 @@ public abstract class AbstractReportBuilder implements IReportBuilder {
         this.generateDirectory(outPath);
         this.outPath = outPath;
         String inPath = outPath;
-        if (part <= 0) {
+        if (part <= 0 || part > 20) {
             inPath = getInPath();
         }
         try {
@@ -108,7 +108,7 @@ public abstract class AbstractReportBuilder implements IReportBuilder {
     }
 
     private void generateDirectory(String outPath) {
-        String directory = outPath.substring(0,outPath.lastIndexOf("/"));
+        String directory = outPath.substring(0, outPath.lastIndexOf("/"));
         File file = new File(directory);
         if (!file.exists()) {
             file.mkdirs();
@@ -121,7 +121,7 @@ public abstract class AbstractReportBuilder implements IReportBuilder {
         String prefix = outPath.substring(0, index);
         String[] split = fileName.split("\\.");
         String name = split[0];
-        return prefix + "/temp/" + name + "_temp.pdf";
+        return prefix + "/temp" + name + "_temp.pdf";
     }
 
     /**

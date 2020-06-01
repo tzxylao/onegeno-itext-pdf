@@ -15,16 +15,16 @@ import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.property.TextAlignment;
 import com.itextpdf.layout.property.VerticalAlignment;
 import com.onegene.pdf.component.AbstractReportBuilder;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 import org.springframework.util.StopWatch;
 
 import java.io.File;
 import java.io.IOException;
 
-class LearnApplicationTests {
+public class LearnApplicationTests {
 
     @Test
-    void contextLoads() throws IOException {
+    public void contextLoads() throws IOException {
         PdfFont font = PdfFontFactory.createFont(AbstractReportBuilder.class.getClassLoader().getResource("font/SourceHanSansCN-Regular.ttf").getPath(), PdfEncodings.IDENTITY_H, true);
 
         String outPath = "/Users/laoliangliang/Desktop/report2.pdf";
@@ -75,9 +75,11 @@ class LearnApplicationTests {
         document.setBorder(new SolidBorder(1));
         document.setMargins(0, 0, 0, 0);
         document.setFont(font);
-        for (int i = 0; i < 73; i++) {
-            document.add(new Paragraph("哈哈哈").setMargin(0).setPadding(0));
-        }
+        Paragraph p1 = new Paragraph("在企业的信息系统中，报表处理一直占比较重要的作用，端使是一种" +
+                "生成PDF报表的Java组件。通过在服务器端使用Jsp或JavaBean生成PDF报表，客户端采用超链接显示或");
+        p1.setFontSize(20);
+        document.add(p1
+                .setFirstLineIndent(40).setMargin(0).setPadding(0));
         document.add(new Paragraph("哈哈哈").setKeepWithNext(true).setBorder(new SolidBorder(1)));
         System.out.println(pdf.getNumberOfPages());
         document.add(new Paragraph("标题").setFontSize(22).setMargin(0).setPadding(0).setBorder(new SolidBorder(1)));
