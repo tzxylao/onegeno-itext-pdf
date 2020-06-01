@@ -6,14 +6,13 @@ import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
+import com.onegene.pdf.component.AbstractReportBuilder;
+import com.onegene.pdf.component.GenoReportBuilder;
 import com.onegene.pdf.component.entity.PrintReportBean;
 import com.onegene.pdf.component.entity.Result;
-import com.onegene.pdf.component.GenoReportBuilder;
-import com.onegene.pdf.component.AbstractReportBuilder;
 import org.springframework.util.StopWatch;
 
 import java.io.File;
-import java.io.IOException;
 
 /**
  * @author: laoliangliang
@@ -21,11 +20,14 @@ import java.io.IOException;
  * @create: 2020/5/19 13:35
  **/
 public class PdfMain {
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
+        String prefix = "/Users/laoliangliang/Desktop/";
+        createDirectory(prefix);
+
         AbstractReportBuilder abstractReportBuilder = new GenoReportBuilder();
-        abstractReportBuilder.initPdf("/Users/laoliangliang/Desktop/report.pdf");
+        abstractReportBuilder.initPdf(prefix + "report.pdf");
         // 获取真实数据
         int selected = 0;
         Result<PrintReportBean> reportBeanResult;
@@ -47,6 +49,18 @@ public class PdfMain {
         abstractReportBuilder.buildAll(data);
         stopWatch.stop();
         System.out.println(stopWatch.getTotalTimeMillis() + "ms");
+    }
+
+    private static void createDirectory(String prefixPath) {
+        File prefixPathFile = new File(prefixPath);
+        if (!prefixPathFile.exists()) {
+            File temp = new File(prefixPath + "temp/");
+            if (!temp.exists()) {
+                temp.mkdirs();
+            } else {
+                prefixPathFile.mkdirs();
+            }
+        }
     }
 
 }
