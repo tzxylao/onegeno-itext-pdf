@@ -197,8 +197,6 @@ public abstract class AbstractReportBuilder implements IReportBuilder {
             pdf.close();
             pdf.close();
             writer.close();
-
-
         } catch (IOException e) {
             e.printStackTrace();
         }
