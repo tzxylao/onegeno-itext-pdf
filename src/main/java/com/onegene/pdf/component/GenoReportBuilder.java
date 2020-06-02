@@ -14,8 +14,8 @@ import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.Style;
 import com.itextpdf.layout.borders.SolidBorder;
-import com.itextpdf.layout.element.List;
 import com.itextpdf.layout.element.*;
+import com.itextpdf.layout.element.List;
 import com.itextpdf.layout.property.*;
 import com.onegene.pdf.component.entity.PrintReportBean;
 import com.onegene.pdf.component.entity.ReportBean;
@@ -30,8 +30,6 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -849,12 +847,6 @@ public class GenoReportBuilder extends AbstractReportBuilder {
             }
         }
         pdf.close();
-        // 删除临时文件
-        try {
-            Files.delete(Paths.get(inPath));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         return this;
     }
 
