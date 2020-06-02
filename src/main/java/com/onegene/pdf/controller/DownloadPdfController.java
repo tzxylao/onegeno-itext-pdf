@@ -80,6 +80,7 @@ public class DownloadPdfController {
 
         PrintReportBean data = getPrintReportBean(token, uuid);
         if (data == null) {
+            log.info("报告数据不存在：{}", uuid);
             return;
         }
         // 若没有目录则创建
