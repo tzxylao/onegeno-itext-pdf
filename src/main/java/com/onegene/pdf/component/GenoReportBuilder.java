@@ -11,6 +11,9 @@ import com.itextpdf.kernel.geom.PageSize;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfReader;
 import com.itextpdf.kernel.pdf.PdfWriter;
+import com.itextpdf.kernel.pdf.action.PdfAction;
+import com.itextpdf.kernel.pdf.navigation.PdfDestination;
+import com.itextpdf.kernel.pdf.navigation.PdfExplicitDestination;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.Style;
 import com.itextpdf.layout.borders.SolidBorder;
@@ -30,6 +33,8 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -787,12 +792,15 @@ public class GenoReportBuilder extends AbstractReportBuilder {
 
     private void addCatalogDetail(int offPage, Table tableCatalog, java.util.List<CataLog> values) {
         for (CataLog cataLog : values) {
-            tableCatalog.addCell(GenoComponent.getCatelogCell().add(new Paragraph(cataLog.getName())));
+            PageSize pageSize = pdf.getDefaultPageSize();
+            PdfDestination dest = PdfExplicitDestination.createXYZ(pdf.getPage(cataLog.getPageNumber()), 60, pageSize.getHeight(), 1);
+            PdfAction action = PdfAction.createGoTo(dest);
+            tableCatalog.addCell(GenoComponent.getCatelogCell().add(new Paragraph(new Link(cataLog.getName(), action))));
             tableCatalog.addCell(GenoComponent.getCatelogCell().add(GenoComponent.getCatelogDottedLine(2)));
             tableCatalog.addCell(GenoComponent.getCatelogCell().add(new List().add(new ListItem(cataLog.getLabel())
                     .setListSymbol(new Image(ImageDataFactory.create(GenoReportBuilder.class.getClassLoader().getResource("image/" + selectColor(cataLog) + "-point.png")))
                             .addStyle(GenoStyle.getDefaultPoint())))));
-            tableCatalog.addCell(GenoComponent.getCatelogCell().add(new Paragraph((cataLog.getPage() + offPage) + "")));
+            tableCatalog.addCell(GenoComponent.getCatelogCell().add(new Paragraph((cataLog.getPageNumber() + offPage) + "")));
             tableCatalog.startNewRow();
         }
     }
@@ -847,6 +855,12 @@ public class GenoReportBuilder extends AbstractReportBuilder {
             }
         }
         pdf.close();
+        // 删除临时文件
+        try {
+            Files.delete(Paths.get(inPath));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         return this;
     }
 

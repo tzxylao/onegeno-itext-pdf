@@ -1,6 +1,5 @@
 package com.onegene.pdf.component;
 
-import cn.hutool.core.io.FileUtil;
 import com.itextpdf.html2pdf.ConverterProperties;
 import com.itextpdf.io.font.PdfEncodings;
 import com.itextpdf.kernel.font.PdfFont;
@@ -120,11 +119,19 @@ public abstract class AbstractReportBuilder implements IReportBuilder {
 
     protected String getInPath() {
         int index = outPath.lastIndexOf("/");
+        int index2 = outPath.lastIndexOf("/", index-1);
+        String prefix = outPath.substring(0, index2);
         String fileName = outPath.substring(index);
-        String prefix = outPath.substring(0, index);
-        String[] split = fileName.split("\\.");
-        String name = split[0];
-        return prefix + "/temp" + name + "_temp.pdf";
+        String name = fileName.split("\\.")[0];
+        String pre = prefix + "/temp";
+        if (!Files.exists(Paths.get(pre))) {
+            try {
+                Files.createDirectories(Paths.get(pre));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return pre + name + "_temp.pdf";
     }
 
     /**
@@ -140,7 +147,7 @@ public abstract class AbstractReportBuilder implements IReportBuilder {
         private String categoryName;
         private String name;
         private String label;
-        private Integer page;
+        private Integer pageNumber;
         private GenoReportBuilder.ExtraParam extraParam;
     }
 
@@ -191,25 +198,7 @@ public abstract class AbstractReportBuilder implements IReportBuilder {
             pdf.close();
             writer.close();
 
-            // 删除临时文件
-            int index = outPath.lastIndexOf("/");
-            String tempDir = outPath.substring(0, index) + "/temp";
-            boolean flag = FileUtil.del(tempDir);
-            if (flag) {
-                log.info("删除目录：{}", tempDir);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
-    public static void main(String[] args) {
-        String str = "/home/lll/pdf/20200602/2acfe69ce9b749baa84b8be8c3791816.pdf";
-        int index = str.lastIndexOf("/");
-        String substring = str.substring(0, index);
-        System.out.println(substring+"/temp");
-        try {
-            Files.deleteIfExists(Paths.get(substring+"/temp"));
         } catch (IOException e) {
             e.printStackTrace();
         }
