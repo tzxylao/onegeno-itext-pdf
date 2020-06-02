@@ -29,6 +29,8 @@ import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -74,7 +76,11 @@ public class DownloadPdfController {
     }
 
     @RequestMapping(value = "/download", method = RequestMethod.GET)
-    public void downLoad(@RequestParam("access_token") String token, @RequestParam("uuid") String uuid, @RequestParam(value = "part", defaultValue = "0") Integer part, HttpServletResponse response) throws IOException {
+    public void downLoad(@RequestParam("access_token") String token,
+                         @RequestParam("uuid") String uuid,
+                         @RequestParam(value = "part", defaultValue = "0") Integer part,
+                         @RequestParam(value = "force", defaultValue = "0") Integer force,
+                         HttpServletResponse response) throws IOException {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
 
@@ -83,11 +89,18 @@ public class DownloadPdfController {
             log.info("报告数据不存在：{}", uuid);
             return;
         }
+
         // 若没有目录则创建
         this.createDirectory();
 
-        // 构建PDF
+        // 若生成则直接返回
         String outPath = prefixPath + uuid + ".pdf";
+        if (Files.exists(Paths.get(outPath)) && (force == null || force != 1)) {
+            writeOutputStream(uuid, response, outPath);
+            return;
+        }
+
+        // 构建PDF
         GenoReportBuilder builder = new GenoReportBuilder();
         builder.setFontPath(fontPath);
         builder.initPdf(outPath, part);
@@ -98,14 +111,19 @@ public class DownloadPdfController {
             builder.invokePartProxy(data);
         }
 
+        writeOutputStream(uuid, response, outPath);
+
+
+        stopWatch.stop();
+        log.info("耗时：" + stopWatch.getTotalTimeMillis() + "ms");
+    }
+
+    private void writeOutputStream(String uuid, HttpServletResponse response, String outPath) throws IOException {
         // 输出
 //        response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
 //        response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment;fileName=" + uuid + ".component");
         response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "inline;fileName=" + uuid + ".pdf");
         FileUtil.writeToStream(new File(outPath), response.getOutputStream());
-
-        stopWatch.stop();
-        log.info("耗时：" + stopWatch.getTotalTimeMillis() + "ms");
     }
 
     private void createDirectory() {
