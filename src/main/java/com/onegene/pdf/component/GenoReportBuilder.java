@@ -384,7 +384,9 @@ public class GenoReportBuilder extends AbstractReportBuilder {
 
         // 检测结果正文
         Paragraph p1 = new Paragraph();
-        p1.add(new Text(itemsBean.getName() + "\n").addStyle(GenoStyle.getTitleStyle()));
+
+        PdfAction action = GenoComponent.getCatalogPageAction(pdf);
+        p1.add(new Link(itemsBean.getName() + "\n", action).addStyle(GenoStyle.getTitleStyle()));
         p1.add(GenoComponent.getSecondTitle("检测结果"));
         doc.add(p1);
 

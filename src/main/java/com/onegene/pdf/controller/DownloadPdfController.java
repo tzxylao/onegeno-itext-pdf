@@ -127,7 +127,7 @@ public class DownloadPdfController {
     }
 
     private void createDirectory() {
-        File prefixPathFile = new File(prefixPath + "temp/");
+        File prefixPathFile = new File(prefixPath);
         if (!prefixPathFile.exists()) {
             prefixPathFile.mkdirs();
         }

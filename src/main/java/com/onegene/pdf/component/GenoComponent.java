@@ -1,5 +1,9 @@
 package com.onegene.pdf.component;
 
+import com.itextpdf.kernel.pdf.PdfDocument;
+import com.itextpdf.kernel.pdf.action.PdfAction;
+import com.itextpdf.kernel.pdf.navigation.PdfDestination;
+import com.itextpdf.kernel.pdf.navigation.PdfExplicitDestination;
 import com.itextpdf.layout.element.Cell;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Text;
@@ -68,6 +72,11 @@ public class GenoComponent {
 
     public static Paragraph getTitleParagraph(Text context){
         return new Paragraph(context).setMargin(0);
+    }
+
+    public static PdfAction getCatalogPageAction(PdfDocument pdf){
+        PdfDestination dest = PdfExplicitDestination.createXYZ(pdf.getPage(6), 60, -10, 1);
+        return PdfAction.createGoTo(dest);
     }
 
 }
