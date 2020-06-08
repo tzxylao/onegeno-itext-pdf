@@ -61,6 +61,9 @@ public class DownloadPdfController {
     @Value("${onegene.pdf.prefix:/Users/laoliangliang/Desktop/}")
     private String prefixPath;
 
+    @Value("${onegene.parallelism:4}")
+    private String parallelism;
+
     @PostConstruct
     public void init() {
         HostInfo hostInfo = SystemUtil.getHostInfo();
@@ -70,7 +73,7 @@ public class DownloadPdfController {
             prefixPath = "/Users/laoliangliang" + prefixPath;
         }
 
-        System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", "10");
+        System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", parallelism);
         // 目标目录加个日期
         prefixPath = prefixPath + DateUtil.format(new Date(), "yyyyMMdd") + "/";
     }
