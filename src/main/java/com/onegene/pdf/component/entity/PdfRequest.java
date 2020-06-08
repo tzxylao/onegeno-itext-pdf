@@ -17,4 +17,5 @@ public class PdfRequest {
      * 为null或者1时，当判断样本已生成时跳过
      */
     private Integer skip;
+    private Integer noUpdate;
 }

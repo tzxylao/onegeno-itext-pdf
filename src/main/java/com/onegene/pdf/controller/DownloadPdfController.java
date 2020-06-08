@@ -154,6 +154,7 @@ public class DownloadPdfController {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         int size = pdfRequest.getUuids().size();
+        Integer noUpdate = pdfRequest.getNoUpdate();
         CountDownLatch countDownLatch = new CountDownLatch(size);
         pdfRequest.getUuids().parallelStream().forEach(uuid -> {
             StopWatch watch = new StopWatch();
@@ -181,8 +182,10 @@ public class DownloadPdfController {
                 builder.setFontPath(fontPath);
                 builder.initPdf(prefixPath + sampleResult.toString() + ".pdf");
                 builder.buildAll(data);
-                // pdf状态成功
-                updatePdfStateById(sampleResult.getId(), SampleExpand.PdfState.YES);
+                if (noUpdate == null || noUpdate != 1) {
+                    // pdf状态成功
+                    updatePdfStateById(sampleResult.getId(), SampleExpand.PdfState.YES);
+                }
 
             } catch (Exception e) {
                 log.info("未知异常：", e);
@@ -191,8 +194,10 @@ public class DownloadPdfController {
                 }
 
                 SampleResult sampleResult = getSampleResult(uuid);
-                // pdf状态失败
-                updatePdfStateById(sampleResult.getId(), SampleExpand.PdfState.FAIL);
+                if (noUpdate == null || noUpdate != 1) {
+                    // pdf状态失败
+                    updatePdfStateById(sampleResult.getId(), SampleExpand.PdfState.FAIL);
+                }
             } finally {
                 watch.stop();
                 log.info(uuid + ",耗时：" + watch.getTotalTimeMillis() + "ms");
