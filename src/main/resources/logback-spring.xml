@@ -53,12 +53,12 @@
     </appender>
     <logger name="com.onegene" level="debug"/>
     <logger name="com.onegene.biology.biologywork.mapper.SampleMapper.selectHealthAndDrug" level="info"/>
-    <springProfile name="local">
+    <springProfile name="local,dev">
         <root level="info">
             <appender-ref ref="CONSOLE"/>
         </root>
     </springProfile>
-    <springProfile name="dev,pro">
+    <springProfile name="pro">
         <root level="info">
             <appender-ref ref="CONSOLE"/>
             <appender-ref ref="DEBUG_FILE"/>
