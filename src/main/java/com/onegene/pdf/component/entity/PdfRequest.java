@@ -17,5 +17,9 @@ public class PdfRequest {
      * 为null或者1时，当判断样本已生成时跳过
      */
     private Integer skip;
+    /**
+     * 0-易感 1-用药
+     */
+    private Integer type;
     private Integer noUpdate;
 }

@@ -45,7 +45,7 @@ public abstract class AbstractReportBuilder implements IReportBuilder {
     protected String fontPath;
     protected PrintReportBean reportBean;
     protected ConverterProperties proper;
-    protected Map<GenoReportBuilder.ExtraParam.CatalogType, java.util.List<GenoReportBuilder.CataLog>> cataLogsMap = new LinkedHashMap<>();
+    protected Map<ExtraParam.CatalogType, java.util.List<CataLog>> cataLogsMap = new LinkedHashMap<>();
     protected Properties properties = new Properties();
 
     public void setPrintReportBean(PrintReportBean printReportBean) {
@@ -101,7 +101,7 @@ public abstract class AbstractReportBuilder implements IReportBuilder {
         //字体设置，解决中文不显示问题
         FontSet fontSet = new FontSet();
         if (fontPath == null) {
-            fontSet.addFont(GenoReportBuilder.class.getClassLoader().getResource("font/SourceHanSansCN-Regular.ttf").getPath(), PdfEncodings.IDENTITY_H);
+            fontSet.addFont(AbstractReportBuilder.class.getClassLoader().getResource("font/SourceHanSansCN-Regular.ttf").getPath(), PdfEncodings.IDENTITY_H);
         } else {
             fontSet.addFont(fontPath, PdfEncodings.IDENTITY_H);
         }
@@ -138,7 +138,7 @@ public abstract class AbstractReportBuilder implements IReportBuilder {
      * 通过代理调用
      */
     @Override
-    public abstract void invokePartProxy(PrintReportBean data);
+    public void invokePartProxy(PrintReportBean data){}
 
     @Data
     @AllArgsConstructor
@@ -148,7 +148,36 @@ public abstract class AbstractReportBuilder implements IReportBuilder {
         private String name;
         private String label;
         private Integer pageNumber;
-        private GenoReportBuilder.ExtraParam extraParam;
+        private ExtraParam extraParam;
+    }
+
+
+    @Data
+    public static class ExtraParam {
+        public enum CatalogType {
+            /**
+             * 目录类别 1-需要注意 2-正常项目
+             */
+            ATTENTION(1), NORMAL(2);
+            private Integer val;
+
+            CatalogType(Integer val) {
+                this.val = val;
+            }
+
+            public Integer val() {
+                return val;
+            }
+        }
+
+        /**
+         * 目录类别 1-需要注意 2-正常项目
+         */
+        private CatalogType type;
+
+        public ExtraParam(CatalogType type) {
+            this.type = type;
+        }
     }
 
     /**
@@ -156,7 +185,7 @@ public abstract class AbstractReportBuilder implements IReportBuilder {
      *
      * @return
      */
-    public AbstractReportBuilder buildAll(PrintReportBean data) {
+    public IReportBuilder buildAll(PrintReportBean data) {
         this.reportBean = data;
         addIndex();
         addHello();
@@ -176,72 +205,65 @@ public abstract class AbstractReportBuilder implements IReportBuilder {
      * 添加首页图片
      */
     @Override
-    public abstract AbstractReportBuilder addIndex();
+    public abstract IReportBuilder addIndex();
 
     /**
      * say hello
      */
     @Override
-    public abstract AbstractReportBuilder addHello();
+    public abstract IReportBuilder addHello();
 
     /**
      * 添加受检人信息
      */
     @Override
-    public abstract AbstractReportBuilder addExaminee();
+    public abstract IReportBuilder addExaminee();
 
     public void build() {
-        try {
-            log.info("输出目录：" + outPath);
-            doc.close();
-            pdf.close();
-            pdf.close();
-            writer.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        log.info("输出目录：" + outPath);
+        pdf.close();
     }
 
     /**
      * 添加检测内容
      */
     @Override
-    public abstract GenoReportBuilder addDetectionContent();
+    public abstract IReportBuilder addDetectionContent();
 
     /**
      * 检测结果概况
      */
     @Override
-    public abstract GenoReportBuilder addResultSummary();
+    public abstract IReportBuilder addResultSummary();
 
     /**
      * 添加正文
      */
     @Override
-    public abstract GenoReportBuilder addContext();
+    public abstract IReportBuilder addContext();
 
     /**
      * 结束语
      */
     @Override
-    public abstract GenoReportBuilder addThanks();
+    public abstract IReportBuilder addThanks();
 
     /**
      * 封底
      */
     @Override
-    public abstract GenoReportBuilder addBackCover();
+    public abstract IReportBuilder addBackCover();
 
     /**
      * 目录
      */
     @Override
-    public abstract GenoReportBuilder addCatalog();
+    public abstract IReportBuilder addCatalog();
 
     /**
      * 页码
      */
     @Override
-    public abstract GenoReportBuilder addPageNumber();
+    public abstract IReportBuilder addPageNumber();
 
 }

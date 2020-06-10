@@ -15,6 +15,7 @@ import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
 import com.itextpdf.layout.Canvas;
 import com.itextpdf.layout.element.Image;
 import com.onegene.pdf.component.entity.ReportBean;
+import com.onegene.pdf.component.report.gene.GenoColor;
 import lombok.Data;
 
 import java.io.IOException;
@@ -32,7 +33,7 @@ public class Painting {
     private PdfDocument pdf;
     private PdfFont font;
 
-    public Painting(PdfDocument pdf,PdfFont font) {
+    public Painting(PdfDocument pdf, PdfFont font) {
         this.pdf = pdf;
         this.font = font;
         PdfPage page = pdf.getPage(pdf.getNumberOfPages());
@@ -129,21 +130,25 @@ public class Painting {
         pdfCanvas.endText();
     }
 
-    public void drawHello(String imagePath) {
+    public void drawHello(String imagePath, float offset) {
         URL resource = Painting.class.getClassLoader().getResource(imagePath);
         Image backImage = new Image(ImageDataFactory.create(resource));
-        PdfPage page = pdf.addNewPage();
+        PdfPage page = pdf.getPage(pdf.getNumberOfPages());
         Rectangle pageSize = page.getPageSize();
         int leftDist = 0;
         Rectangle rectangle = new Rectangle(
                 pageSize.getX() + leftDist,
-                pageSize.getTop(),
+                pageSize.getTop() + offset,
                 pageSize.getWidth() - leftDist * 2,
                 40);
 
         Canvas canvas = new Canvas(page, rectangle);
         canvas.add(backImage).flush();
         canvas.close();
+    }
+
+    public void drawHello(String imagePath) {
+        drawHello(imagePath, 0);
     }
 
     public void drawWss(int level, ReportBean.ItemsBean itemsBean) {
@@ -197,7 +202,7 @@ public class Painting {
         if (level == 2) {
             pdfCanvas.setFillColor(GenoColor.getThemeColor());
         } else {
-            pdfCanvas.setFillColor(new DeviceRgb(159,159,159));
+            pdfCanvas.setFillColor(new DeviceRgb(159, 159, 159));
         }
         pdfCanvas.moveText(pageSize.getWidth() / 2 - 70 - 12, yOffset + textHeightOff);
         pdfCanvas.showText("正常").stroke();
@@ -207,7 +212,7 @@ public class Painting {
         if (level == 3) {
             pdfCanvas.setFillColor(GenoColor.getOrangeColor());
         } else {
-            pdfCanvas.setFillColor(new DeviceRgb(159,159,159));
+            pdfCanvas.setFillColor(new DeviceRgb(159, 159, 159));
         }
         pdfCanvas.moveText(pageSize.getWidth() / 2 + 0 - 12, yOffset + textHeightOff);
         pdfCanvas.showText("稍高");
@@ -217,7 +222,7 @@ public class Painting {
         if (level == 4) {
             pdfCanvas.setFillColor(GenoColor.getRedColor());
         } else {
-            pdfCanvas.setFillColor(new DeviceRgb(159,159,159));
+            pdfCanvas.setFillColor(new DeviceRgb(159, 159, 159));
         }
         pdfCanvas.moveText(pageSize.getWidth() / 2 + 70 - 6, yOffset + textHeightOff);
         pdfCanvas.showText("高");

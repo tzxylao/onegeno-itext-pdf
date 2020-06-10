@@ -1,5 +1,6 @@
-package com.onegene.pdf.component;
+package com.onegene.pdf.component.report.gene;
 
+import com.onegene.pdf.component.AbstractReportBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StopWatch;
 
@@ -13,9 +14,9 @@ import java.lang.reflect.Method;
  **/
 @Slf4j
 public class GenoReportProxy implements InvocationHandler {
-    private GenoReportBuilder builder;
+    private AbstractReportBuilder builder;
 
-    public GenoReportProxy(GenoReportBuilder builder) {
+    public GenoReportProxy(AbstractReportBuilder builder) {
         this.builder = builder;
     }
 

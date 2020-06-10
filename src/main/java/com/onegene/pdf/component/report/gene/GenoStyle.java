@@ -1,4 +1,4 @@
-package com.onegene.pdf.component;
+package com.onegene.pdf.component.report.gene;
 
 import com.itextpdf.kernel.colors.ColorConstants;
 import com.itextpdf.layout.Style;

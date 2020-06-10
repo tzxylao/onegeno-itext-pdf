@@ -1,4 +1,4 @@
-package com.onegene.pdf.component;
+package com.onegene.pdf.component.report.gene;
 
 import cn.hutool.core.date.DateUtil;
 import com.itextpdf.html2pdf.HtmlConverter;
@@ -20,11 +20,14 @@ import com.itextpdf.layout.borders.SolidBorder;
 import com.itextpdf.layout.element.*;
 import com.itextpdf.layout.element.List;
 import com.itextpdf.layout.property.*;
+import com.onegene.pdf.component.AbstractReportBuilder;
+import com.onegene.pdf.component.Constant;
+import com.onegene.pdf.component.IReportBuilder;
+import com.onegene.pdf.component.Painting;
 import com.onegene.pdf.component.entity.PrintReportBean;
 import com.onegene.pdf.component.entity.ReportBean;
 import com.onegene.pdf.component.event.CatalogMoveEvent;
 import com.onegene.pdf.component.event.HeaderTextEvent;
-import lombok.Data;
 import org.springframework.util.StringUtils;
 
 import java.io.File;
@@ -65,12 +68,12 @@ public class GenoReportBuilder extends AbstractReportBuilder {
     }
 
     @Override
-    public GenoReportBuilder addIndex() {
-        Image indexImage = new Image(ImageDataFactory.create(GenoReportBuilder.class.getClassLoader().getResource("image/成人纸质报告-54.png")));
+    public IReportBuilder addIndex() {
+        Image indexImage = new Image(ImageDataFactory.create(GenoReportBuilder.class.getClassLoader().getResource("image/gene/成人纸质报告-54.png")));
         indexImage.setMargins(-50, -60, -60, -60);
-        Image introductionImage = new Image(ImageDataFactory.create(GenoReportBuilder.class.getClassLoader().getResource("image/gene.png")));
+        Image introductionImage = new Image(ImageDataFactory.create(GenoReportBuilder.class.getClassLoader().getResource("image/gene/gene.png")));
         introductionImage.setMargins(-50, -60, -60, -60);
-        Image honorImage = new Image(ImageDataFactory.create(GenoReportBuilder.class.getClassLoader().getResource("image/honor.png")));
+        Image honorImage = new Image(ImageDataFactory.create(GenoReportBuilder.class.getClassLoader().getResource("image/gene/honor.png")));
         honorImage.setMargins(-50, -60, -60, -60);
 
         doc.add(indexImage);
@@ -81,8 +84,10 @@ public class GenoReportBuilder extends AbstractReportBuilder {
     }
 
     @Override
-    public GenoReportBuilder addHello() {
+    public IReportBuilder addHello() {
         ReportBean.IndexBean index = reportBean.getIndex();
+
+        doc.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
 
         Div div = new Div();
         div.setWidth(UnitValue.createPercentValue(100));
@@ -110,7 +115,7 @@ public class GenoReportBuilder extends AbstractReportBuilder {
 
 
         Painting painting = new Painting(pdf, font);
-        painting.drawHello("image/纸质报告-03.png");
+        painting.drawHello("image/gene/纸质报告-03.png");
         painting.close();
 
         doc.add(div);
@@ -118,12 +123,12 @@ public class GenoReportBuilder extends AbstractReportBuilder {
     }
 
     @Override
-    public AbstractReportBuilder addExaminee() {
+    public IReportBuilder addExaminee() {
         ReportBean.IndexBean index = reportBean.getIndex();
 
         doc.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
         Div div1 = new Div();
-        Image iconImage27 = new Image(ImageDataFactory.create(GenoReportBuilder.class.getClassLoader().getResource("image/icon-27.png")));
+        Image iconImage27 = new Image(ImageDataFactory.create(GenoReportBuilder.class.getClassLoader().getResource("image/gene/icon-27.png")));
         Paragraph p1 = new Paragraph();
         p1.add(iconImage27.addStyle(GenoStyle.getIconStyle()));
         p1.add(new Text("受检人信息").addStyle(GenoStyle.getTitleStyle()));
@@ -138,7 +143,7 @@ public class GenoReportBuilder extends AbstractReportBuilder {
         table.addCell(GenoComponent.getDefaultCell().add(GenoComponent.getSignParagraph("年 龄：" + (DateUtil.year(new Date()) - index.getBirthYear()))));
         table.startNewRow();
         table.addCell(GenoComponent.getDefaultCell().add(GenoComponent.getSignParagraph("样本编号：" + index.getSampleCode())));
-        table.addCell(GenoComponent.getDefaultCell().add(GenoComponent.getSignParagraph("样本类型：基因组DNA")));
+        table.addCell(GenoComponent.getDefaultCell().add(GenoComponent.getSignParagraph("样本类型：口腔粘膜细胞")));
         table.startNewRow();
         table.addCell(GenoComponent.getDefaultCell().add(GenoComponent.getSignParagraph("样本检测结果：合格")));
         table.addCell(GenoComponent.getDefaultCell().add(GenoComponent.getSignParagraph("报告日期：" + (DateUtil.format(new Date(), "yyyy年M月d日")))));
@@ -149,12 +154,12 @@ public class GenoReportBuilder extends AbstractReportBuilder {
 
 
     @Override
-    public GenoReportBuilder addDetectionContent() {
+    public IReportBuilder addDetectionContent() {
         ReportBean.IndexBean index = reportBean.getIndex();
 
         Div div1 = new Div();
         div1.setMargins(30, 0, 20, 0);
-        Image iconImage27 = new Image(ImageDataFactory.create(GenoReportBuilder.class.getClassLoader().getResource("image/icon-29.png")));
+        Image iconImage27 = new Image(ImageDataFactory.create(GenoReportBuilder.class.getClassLoader().getResource("image/gene/icon-29.png")));
         Paragraph p1 = new Paragraph();
         p1.add(iconImage27.addStyle(GenoStyle.getIconStyle()));
         p1.add(new Text("检测内容").addStyle(GenoStyle.getTitleStyle()));
@@ -187,7 +192,7 @@ public class GenoReportBuilder extends AbstractReportBuilder {
         signatureTable.addCell(GenoComponent.getSignCell().add(GenoComponent.getSignParagraph("日期：" + (DateUtil.format(new Date(), "yyyy年M月d日")))));
         div2.add(signatureTable);
 
-        Image iconImage01 = new Image(ImageDataFactory.create(GenoReportBuilder.class.getClassLoader().getResource("image/image-01.png")));
+        Image iconImage01 = new Image(ImageDataFactory.create(GenoReportBuilder.class.getClassLoader().getResource("image/gene/image-01.png")));
         iconImage01.setWidth(105);
         iconImage01.setHeight(105);
         iconImage01.setRelativePosition(295, 0, 60, 90);
@@ -200,7 +205,7 @@ public class GenoReportBuilder extends AbstractReportBuilder {
     }
 
     @Override
-    public GenoReportBuilder addResultSummary() {
+    public IReportBuilder addResultSummary() {
         java.util.List<ReportBean.CategoriesBean> categories = reportBean.getCategories();
         ReportBean.IndexBean index = reportBean.getIndex();
 
@@ -226,7 +231,7 @@ public class GenoReportBuilder extends AbstractReportBuilder {
 
         Table t1 = new Table(2).useAllAvailableWidth();
         t1.setMargins(30, -10, 20, 0);
-        Image goodTipImage = new Image(ImageDataFactory.create(GenoReportBuilder.class.getClassLoader().getResource("image/goodtip.png")));
+        Image goodTipImage = new Image(ImageDataFactory.create(GenoReportBuilder.class.getClassLoader().getResource("image/gene/goodtip.png")));
         t1.addCell(GenoComponent.getDefaultCell(2, 1).setWidth(65).setPaddingBottom(30).add(goodTipImage.addStyle(GenoStyle.getLargeIconStyle())));
         t1.addCell(GenoComponent.getDefaultCell().add(new Paragraph("优势标签").addStyle(GenoStyle.getThirdTitleStyle())));
         // 优势标签
@@ -254,7 +259,7 @@ public class GenoReportBuilder extends AbstractReportBuilder {
         t1.startNewRow();
 
         // 需要注意
-        Image badTipImage = new Image(ImageDataFactory.create(GenoReportBuilder.class.getClassLoader().getResource("image/badtip.png")));
+        Image badTipImage = new Image(ImageDataFactory.create(GenoReportBuilder.class.getClassLoader().getResource("image/gene/badtip.png")));
         t1.addCell(GenoComponent.getDefaultCell(2, 1).setWidth(70).setPaddingRight(20).add(badTipImage.addStyle(GenoStyle.getLargeIconStyle())));
         t1.addCell(GenoComponent.getDefaultCell().add(new Paragraph("需要注意").addStyle(GenoStyle.getThreeTitleOrangeStyle())));
 
@@ -303,13 +308,13 @@ public class GenoReportBuilder extends AbstractReportBuilder {
 
         // 加个详细检测结果页
         doc.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
-        Image image88 = new Image(ImageDataFactory.create(GenoReportBuilder.class.getClassLoader().getResource("image/成人纸质报告8.8-10.png")));
+        Image image88 = new Image(ImageDataFactory.create(GenoReportBuilder.class.getClassLoader().getResource("image/gene/成人纸质报告8.8-10.png")));
         doc.add(image88);
         return this;
     }
 
     @Override
-    public GenoReportBuilder addContext() {
+    public IReportBuilder addContext() {
         java.util.List<ReportBean.ItemsBean> gaoLevel = new LinkedList<>();
         java.util.Set<ReportBean.CategoriesBean> normalLecel = new LinkedHashSet<>();
         java.util.List<ReportBean.CategoriesBean> categories = reportBean.getCategories();
@@ -340,7 +345,7 @@ public class GenoReportBuilder extends AbstractReportBuilder {
                 continue;
             }
             doc.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
-            URL resource = GenoReportBuilder.class.getClassLoader().getResource("image/" + categoriesBean.getCode() + ".png");
+            URL resource = GenoReportBuilder.class.getClassLoader().getResource("image/gene/" + categoriesBean.getCode() + ".png");
             Image backgroundImage = new Image(ImageDataFactory.create(resource));
             doc.add(backgroundImage);
 
@@ -655,7 +660,7 @@ public class GenoReportBuilder extends AbstractReportBuilder {
 
     private void addPersonalityTraits(ReportBean.ItemsBean itemsBean, String categoryCode) {
         Color[] colors = new Color[]{new DeviceRgb(112, 223, 191), new DeviceRgb(30, 191, 190), new DeviceRgb(37, 98, 206), new DeviceRgb(248, 182, 45), new DeviceRgb(242, 107, 111)};
-        URL resource = Painting.class.getClassLoader().getResource("image/individual/" + (itemsBean.getIndex() + 1) + ".png");
+        URL resource = Painting.class.getClassLoader().getResource("image/gene/individual/" + (itemsBean.getIndex() + 1) + ".png");
         Image personImage = new Image(ImageDataFactory.create(resource));
         personImage.scale(0.25f, 0.25f);
         personImage.setHorizontalAlignment(HorizontalAlignment.CENTER);
@@ -695,7 +700,7 @@ public class GenoReportBuilder extends AbstractReportBuilder {
                 "\n" +
                 "\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0如果您对我们检测服务和体验有任何意见或建议，敬请拨打我们的健康热线400-163-5588，或者手机扫描下部二维码，联系您的专属健康顾问。"));
         doc.add(p1);
-        URL resource = GenoReportBuilder.class.getClassLoader().getResource("image/结束语.png");
+        URL resource = GenoReportBuilder.class.getClassLoader().getResource("image/gene/结束语.png");
         Image backImage = new Image(ImageDataFactory.create(resource));
         int pageNum = pdf.getNumberOfPages();
         backImage.setFixedPosition(pageNum, 0, 0, UnitValue.createPercentValue(125));
@@ -722,7 +727,7 @@ public class GenoReportBuilder extends AbstractReportBuilder {
         doc.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
         doc.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
 
-        Image backCoverImage = new Image(ImageDataFactory.create(GenoReportBuilder.class.getClassLoader().getResource("image/封底-02.png")));
+        Image backCoverImage = new Image(ImageDataFactory.create(GenoReportBuilder.class.getClassLoader().getResource("image/gene/封底-02.png")));
         backCoverImage.setWidth(UnitValue.createPercentValue(100));
         backCoverImage.scale(1.3f, 1.3f);
         backCoverImage.setMarginLeft(-70);
@@ -800,7 +805,7 @@ public class GenoReportBuilder extends AbstractReportBuilder {
             tableCatalog.addCell(GenoComponent.getCatelogCell().add(new Paragraph(new Link(cataLog.getName(), action))));
             tableCatalog.addCell(GenoComponent.getCatelogCell().add(GenoComponent.getCatelogDottedLine(2)));
             tableCatalog.addCell(GenoComponent.getCatelogCell().add(new List().add(new ListItem(cataLog.getLabel())
-                    .setListSymbol(new Image(ImageDataFactory.create(GenoReportBuilder.class.getClassLoader().getResource("image/" + selectColor(cataLog) + "-point.png")))
+                    .setListSymbol(new Image(ImageDataFactory.create(GenoReportBuilder.class.getClassLoader().getResource("image/gene/" + selectColor(cataLog) + "-point.png")))
                             .addStyle(GenoStyle.getDefaultPoint())))));
             tableCatalog.addCell(GenoComponent.getCatelogCell().add(new Paragraph((cataLog.getPageNumber() + offPage) + "")));
             tableCatalog.startNewRow();
@@ -867,32 +872,5 @@ public class GenoReportBuilder extends AbstractReportBuilder {
     }
 
 
-    @Data
-    static class ExtraParam {
-        public enum CatalogType {
-            /**
-             * 目录类别 1-需要注意 2-正常项目
-             */
-            ATTENTION(1), NORMAL(2);
-            private Integer val;
-
-            CatalogType(Integer val) {
-                this.val = val;
-            }
-
-            public Integer val() {
-                return val;
-            }
-        }
-
-        /**
-         * 目录类别 1-需要注意 2-正常项目
-         */
-        private CatalogType type;
-
-        public ExtraParam(CatalogType type) {
-            this.type = type;
-        }
-    }
 
 }

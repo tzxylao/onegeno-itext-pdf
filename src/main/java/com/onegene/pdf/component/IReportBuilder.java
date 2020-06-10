@@ -17,50 +17,50 @@ public interface IReportBuilder {
     /**
      * 添加首页图片
      */
-    AbstractReportBuilder addIndex();
+    IReportBuilder addIndex();
 
     /**
      * say hello
      */
-    AbstractReportBuilder addHello();
+    IReportBuilder addHello();
 
     /**
      * 添加受检人信息
      */
-    AbstractReportBuilder addExaminee();
+    IReportBuilder addExaminee();
 
     /**
      * 添加检测内容
      */
-    GenoReportBuilder addDetectionContent();
+    IReportBuilder addDetectionContent();
 
     /**
      * 检测结果概况
      */
-    GenoReportBuilder addResultSummary();
+    IReportBuilder addResultSummary();
 
     /**
      * 添加正文
      */
-    GenoReportBuilder addContext();
+    IReportBuilder addContext();
 
     /**
      * 结束语
      */
-    GenoReportBuilder addThanks();
+    IReportBuilder addThanks();
 
     /**
      * 封底
      */
-    GenoReportBuilder addBackCover();
+    IReportBuilder addBackCover();
 
     /**
      * 目录
      */
-    GenoReportBuilder addCatalog();
+    IReportBuilder addCatalog();
 
     /**
      * 页码
      */
-    GenoReportBuilder addPageNumber();
+    IReportBuilder addPageNumber();
 }

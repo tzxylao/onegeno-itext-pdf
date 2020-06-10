@@ -1,4 +1,4 @@
-package com.onegene.pdf.component;
+package com.onegene.pdf.component.report.gene;
 
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.action.PdfAction;

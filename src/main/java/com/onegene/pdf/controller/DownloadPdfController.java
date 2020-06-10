@@ -7,10 +7,12 @@ import cn.hutool.system.HostInfo;
 import cn.hutool.system.SystemUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
-import com.onegene.pdf.component.GenoReportBuilder;
+import com.onegene.pdf.component.AbstractReportBuilder;
 import com.onegene.pdf.component.entity.PdfRequest;
 import com.onegene.pdf.component.entity.PrintReportBean;
 import com.onegene.pdf.component.entity.Result;
+import com.onegene.pdf.component.report.drug.AdultDrugReportBuilder;
+import com.onegene.pdf.component.report.gene.GenoReportBuilder;
 import com.onegene.pdf.entity.Sample;
 import com.onegene.pdf.entity.SampleExpand;
 import com.onegene.pdf.entity.SampleResult;
@@ -55,8 +57,11 @@ public class DownloadPdfController {
     @Value("${onegene.font.path}")
     private String fontPath;
 
-    @Value("${onegene.biology.print.url:http://infoapi.1genehealth.com/biology/bio/report/print}")
-    private String url;
+    @Value("${onegene.biology.print.gene.url:http://infoapi.1genehealth.com/biology/bio/report/print}")
+    private String geneUrl;
+
+    @Value("${onegene.biology.print.medical.url:http://infoapi.1genehealth.com/biology/bio/report/medical/print}")
+    private String adultDrugUrl;
 
     @Value("${onegene.pdf.prefix:/Users/laoliangliang/Desktop/}")
     private String prefixPath;
@@ -81,13 +86,14 @@ public class DownloadPdfController {
     @RequestMapping(value = "/download", method = RequestMethod.GET)
     public void downLoad(@RequestParam("access_token") String token,
                          @RequestParam("uuid") String uuid,
+                         @RequestParam(value = "type", defaultValue = "0") Integer type,
                          @RequestParam(value = "part", defaultValue = "0") Integer part,
                          @RequestParam(value = "force", defaultValue = "0") Integer force,
                          HttpServletResponse response) throws IOException {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
 
-        PrintReportBean data = getPrintReportBean(token, uuid);
+        PrintReportBean data = getGeneReportBean(token, uuid, type);
         if (data == null) {
             log.info("报告数据不存在：{}", uuid);
             return;
@@ -103,8 +109,13 @@ public class DownloadPdfController {
             return;
         }
 
+        AbstractReportBuilder builder;
         // 构建PDF
-        GenoReportBuilder builder = new GenoReportBuilder();
+        if (type == 1) {
+            builder = new AdultDrugReportBuilder();
+        }else{
+            builder = new GenoReportBuilder();
+        }
         builder.setFontPath(fontPath);
         builder.initPdf(outPath, part);
 
@@ -126,7 +137,10 @@ public class DownloadPdfController {
 //        response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
 //        response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment;fileName=" + uuid + ".component");
         response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "inline;fileName=" + uuid + ".pdf");
-        FileUtil.writeToStream(new File(outPath), response.getOutputStream());
+        File file = new File(outPath);
+        if (file.exists()) {
+            FileUtil.writeToStream(file, response.getOutputStream());
+        }
     }
 
     private void createDirectory() {
@@ -136,9 +150,20 @@ public class DownloadPdfController {
         }
     }
 
-    private PrintReportBean getPrintReportBean(@RequestParam("access_token") String token, @RequestParam("uuid") String uuid) {
-        Map<String, Object> params = new HashMap<>();
-        String body = HttpUtil.post(url + "?access_token=" + token + "&uuid=" + uuid, params);
+    /**
+     * @param token
+     * @param uuid
+     * @param type  0-易感 1-用药
+     * @return
+     */
+    private PrintReportBean getGeneReportBean(String token, String uuid, Integer type) {
+        Map<String, Object> params = new HashMap<>(1);
+        String body;
+        if (type == 1) {
+            body = HttpUtil.post(adultDrugUrl + "?access_token=" + token + "&uuid=" + uuid, params);
+        } else {
+            body = HttpUtil.post(geneUrl + "?access_token=" + token + "&uuid=" + uuid, params);
+        }
         Result<PrintReportBean> reportBeanResult = JSON.parseObject(body, new TypeReference<Result<PrintReportBean>>() {
         });
         if (reportBeanResult == null) {
@@ -175,13 +200,19 @@ public class DownloadPdfController {
                     return;
                 }
 
-                PrintReportBean data = getPrintReportBean(pdfRequest.getToken(), uuid);
+                Integer type = pdfRequest.getType();
+                PrintReportBean data = getGeneReportBean(pdfRequest.getToken(), uuid, type);
                 if (data == null) {
                     log.error("uuid:{} pdf数据不存在", uuid);
                     return;
                 }
 
-                GenoReportBuilder builder = new GenoReportBuilder();
+                AbstractReportBuilder builder;
+                if (type == 1) {
+                    builder = new AdultDrugReportBuilder();
+                } else {
+                    builder = new GenoReportBuilder();
+                }
                 builder.setFontPath(fontPath);
                 builder.initPdf(prefixPath + sampleResult.toString() + ".pdf");
                 builder.buildAll(data);
