@@ -11,6 +11,7 @@ import com.itextpdf.layout.Document;
 import com.itextpdf.layout.font.FontProvider;
 import com.itextpdf.layout.font.FontSet;
 import com.onegene.pdf.component.entity.PrintReportBean;
+import com.onegene.pdf.util.Precondition;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
@@ -187,6 +188,7 @@ public abstract class AbstractReportBuilder implements IReportBuilder {
      */
     public IReportBuilder buildAll(PrintReportBean data) {
         this.reportBean = data;
+        Precondition.checkNotNull(reportBean, "报告数据为空");
         addIndex();
         addHello();
         addExaminee();

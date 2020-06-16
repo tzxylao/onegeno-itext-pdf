@@ -12,8 +12,6 @@ import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfReader;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.kernel.pdf.action.PdfAction;
-import com.itextpdf.kernel.pdf.navigation.PdfDestination;
-import com.itextpdf.kernel.pdf.navigation.PdfExplicitDestination;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.Style;
 import com.itextpdf.layout.borders.SolidBorder;
@@ -216,15 +214,17 @@ public class GenoReportBuilder extends AbstractReportBuilder {
         p1.add(new Text("检测结果概况\n").addStyle(GenoStyle.getTitleStyle().setFontSize(22f)));
         p1.add(new Text("本次检测包括"));
         int size = categories.size();
+        int count = 0;
+        StringBuilder categoryContent = new StringBuilder();
         for (int i = 0; i < size; i++) {
             ReportBean.CategoriesBean category = categories.get(i);
-            p1.add(new Text(category.getName()).addStyle(GenoStyle.getThirdTitleStyle()));
-            if (i != size - 1) {
-                p1.add(new Text("、").addStyle(GenoStyle.getThirdTitleStyle()));
+            if (category.getUnlockedItems() > 0) {
+                categoryContent.append(category.getName()).append("、");
+                count++;
             }
-
         }
-        p1.add(new Text(size + "部分内容\n"));
+        p1.add(new Text(categoryContent.substring(0, categoryContent.length() - 1)).addStyle(GenoStyle.getThirdTitleStyle()));
+        p1.add(new Text(count + "部分内容\n"));
         p1.add(new Text("共计"));
         p1.add(new Text(index.getUnlockedItems() + "").addStyle(GenoStyle.getThirdTitleStyle()));
         p1.add(new Text("项检测项目"));
@@ -799,10 +799,7 @@ public class GenoReportBuilder extends AbstractReportBuilder {
 
     private void addCatalogDetail(int offPage, Table tableCatalog, java.util.List<CataLog> values) {
         for (CataLog cataLog : values) {
-            PageSize pageSize = pdf.getDefaultPageSize();
-            PdfDestination dest = PdfExplicitDestination.createXYZ(pdf.getPage(cataLog.getPageNumber()), 60, pageSize.getHeight(), 1);
-            PdfAction action = PdfAction.createGoTo(dest);
-            tableCatalog.addCell(GenoComponent.getCatelogCell().add(new Paragraph(new Link(cataLog.getName(), action))));
+            tableCatalog.addCell(GenoComponent.getCatelogCell().add(new Paragraph(cataLog.getName())));
             tableCatalog.addCell(GenoComponent.getCatelogCell().add(GenoComponent.getCatelogDottedLine(2)));
             tableCatalog.addCell(GenoComponent.getCatelogCell().add(new List().add(new ListItem(cataLog.getLabel())
                     .setListSymbol(new Image(ImageDataFactory.create(GenoReportBuilder.class.getClassLoader().getResource("image/gene/" + selectColor(cataLog) + "-point.png")))
@@ -870,7 +867,6 @@ public class GenoReportBuilder extends AbstractReportBuilder {
         }
         return this;
     }
-
 
 
 }

@@ -2,22 +2,28 @@ package com.onegene.pdf.component.report.drug;
 
 import cn.hutool.core.date.DateUtil;
 import com.itextpdf.io.image.ImageDataFactory;
+import com.itextpdf.kernel.colors.ColorConstants;
+import com.itextpdf.kernel.events.PdfDocumentEvent;
+import com.itextpdf.kernel.pdf.action.PdfAction;
 import com.itextpdf.layout.Style;
 import com.itextpdf.layout.borders.SolidBorder;
 import com.itextpdf.layout.element.*;
 import com.itextpdf.layout.property.AreaBreakType;
+import com.itextpdf.layout.property.BorderRadius;
 import com.itextpdf.layout.property.HorizontalAlignment;
 import com.itextpdf.layout.property.UnitValue;
 import com.onegene.pdf.component.AbstractReportBuilder;
 import com.onegene.pdf.component.IReportBuilder;
 import com.onegene.pdf.component.Painting;
 import com.onegene.pdf.component.entity.ReportBean;
+import com.onegene.pdf.component.event.HeaderTextEvent;
 import com.onegene.pdf.component.report.gene.GenoColor;
 import com.onegene.pdf.component.report.gene.GenoComponent;
 import com.onegene.pdf.component.report.gene.GenoReportBuilder;
 import com.onegene.pdf.component.report.gene.GenoStyle;
 
-import java.util.Date;
+import java.util.*;
+import java.util.List;
 
 /**
  * @author: laoliangliang
@@ -51,7 +57,7 @@ public class AdultDrugReportBuilder extends AbstractReportBuilder {
         Paragraph p1 = new Paragraph();
         p1.setHorizontalAlignment(HorizontalAlignment.CENTER);
         p1.setMaxWidth(UnitValue.createPercentValue(75));
-        p1.setMarginTop(100f);
+        p1.setMarginTop(80f);
         p1.setCharacterSpacing(0.4f);
         Style large = new Style();
         large.setFontSize(22);
@@ -79,7 +85,7 @@ public class AdultDrugReportBuilder extends AbstractReportBuilder {
 
         doc.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
         Painting painting = new Painting(pdf, font);
-        painting.drawHello("image/drug/person_result.png",-40);
+        painting.drawHello("image/drug/person_result.png", -40);
         painting.close();
 
         Div div1 = new Div();
@@ -141,12 +147,208 @@ public class AdultDrugReportBuilder extends AbstractReportBuilder {
 
     @Override
     public IReportBuilder addResultSummary() {
-        return null;
+        java.util.List<ReportBean.CategoriesBean> categories = reportBean.getCategories();
+        ReportBean.IndexBean index = reportBean.getIndex();
+
+        doc.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
+        Paragraph header = GenoComponent.getHeaderLineText("检测结果概况");
+        doc.add(header);
+
+        Paragraph p1 = new Paragraph();
+        p1.add(new Text("检测结果概况\n").addStyle(GenoStyle.getTitleStyle().setFontSize(22f)));
+        p1.add(new Text("本次检测包括"));
+        int size = categories.size();
+        int count = 0;
+        StringBuilder categoryContent = new StringBuilder();
+        for (int i = 0; i < size; i++) {
+            ReportBean.CategoriesBean category = categories.get(i);
+            if (category.getUnlockedItems() > 0) {
+                categoryContent.append(category.getName()).append("、");
+                count++;
+            }
+        }
+        p1.add(new Text(categoryContent.substring(0, categoryContent.length() - 1)).addStyle(GenoStyle.getThirdTitleStyle()));
+
+        int avoidSize = index.getAvoidUseTags().size();
+        int careSize = index.getCarefulUseTags().size();
+        p1.add(new Text("等"));
+        p1.add(new Text(count + "").addStyle(GenoStyle.getThirdTitleStyle()));
+        p1.add(new Text("类共计"));
+        p1.add(new Text(index.getUnlockedItems() + "").addStyle(GenoStyle.getThirdTitleStyle()));
+        p1.add(new Text("种药物的用药安全情况，详情请参考详细检测结果； 其中"));
+        p1.add(new Text((avoidSize > 0 ? avoidSize + "" : "")).addStyle(GenoStyle.getThirdTitleStyle()));
+        p1.add(new Text((avoidSize > 0 ? "种药物需要避免使用," : "暂无药物需要避免使用,")));
+        p1.add(new Text((careSize > 0 ? careSize + "" : "")).addStyle(GenoStyle.getThirdTitleStyle()));
+        p1.add(new Text((careSize > 0 ? "种药物需要谨慎使用," : "暂无药物需要谨慎使用,")));
+        p1.add(new Text("部分药物如下:\n"));
+        doc.add(p1);
+
+        Table t1 = new Table(2).useAllAvailableWidth();
+        t1.setMargins(30, -10, 20, 0);
+        Image goodTipImage = new Image(ImageDataFactory.create(GenoReportBuilder.class.getClassLoader().getResource("image/drug/icon/bm.png")));
+        t1.addCell(GenoComponent.getDefaultCell(2, 1).setWidth(65).setPaddingBottom(30).add(goodTipImage.addStyle(GenoStyle.getLargeIconStyle())));
+        t1.addCell(GenoComponent.getDefaultCell().add(new Paragraph("需避免使用的药物").addStyle(DrugStyle.getThirdTitleStyle())));
+        // 优势标签
+        java.util.List<ReportBean.IndexBean.TagBean> goodTags = index.getAvoidUseTags();
+        int goodSize = goodTags.size();
+        if (goodSize <= 0) {
+            t1.addCell(GenoComponent.getDefaultCell().add(new Paragraph("暂无需要避免使用的药物")));
+        } else {
+            Div tabDiv = new Div();
+            Paragraph element = new Paragraph();
+            for (int i = 0; i < goodSize; i++) {
+                ReportBean.IndexBean.TagBean tagBean = goodTags.get(i);
+                Text text = new Text(tagBean.getName() + ((i + 1) % 3 == 0 ? "\n" : ""));
+                Style style = new Style();
+                style.setPaddings(3, 10, 3, 10);
+                style.setBackgroundColor(DrugColor.getRedColor());
+                style.setBorderRadius(new BorderRadius(10));
+                style.setFontColor(ColorConstants.WHITE);
+                style.setMargins(0, 3, 0, 3);
+                text.addStyle(style);
+                element.add(text);
+            }
+            t1.addCell(GenoComponent.getDefaultCell().add(tabDiv));
+        }
+        t1.startNewRow();
+
+        // 需要注意
+        Image badTipImage = new Image(ImageDataFactory.create(GenoReportBuilder.class.getClassLoader().getResource("image/drug/icon/js.png")));
+        t1.addCell(GenoComponent.getDefaultCell(2, 1).setWidth(70).setPaddingRight(20).add(badTipImage.addStyle(GenoStyle.getLargeIconStyle())));
+        t1.addCell(GenoComponent.getDefaultCell().add(new Paragraph("需谨慎使用的药物").addStyle(DrugStyle.getThreeTitleOrangeStyle())));
+
+
+        java.util.List<ReportBean.IndexBean.TagBean> badTags = index.getCarefulUseTags();
+        int badSize = badTags.size();
+        if (badSize == 0) {
+            t1.addCell(GenoComponent.getDefaultCell().add(new Paragraph("暂无优势项目")));
+        } else {
+            Div tabDiv = new Div();
+            Paragraph element = new Paragraph();
+            for (int i = 0; i < badSize; i++) {
+                ReportBean.IndexBean.TagBean tagBean = badTags.get(i);
+                Text text = new Text(tagBean.getName() + ((i + 1) % 3 == 0 ? "\n" : ""));
+                Style style = new Style();
+                style.setPaddings(3, 10, 3, 10);
+                style.setBackgroundColor(DrugColor.getOrangeColor());
+                style.setBorderRadius(new BorderRadius(10));
+                style.setFontColor(ColorConstants.WHITE);
+                style.setMargins(0, 3, 0, 3);
+                text.addStyle(style);
+                element.add(text);
+            }
+            tabDiv.add(element);
+            t1.addCell(GenoComponent.getDefaultCell().add(tabDiv));
+        }
+        doc.add(t1);
+
+        Div div = new Div();
+        div.setFixedPosition(60, 90, UnitValue.createPercentValue(110));
+        Paragraph p2 = new Paragraph();
+//        p2.setFixedPosition(60, 90, UnitValue.createPercentValue(110));
+        p2.add(GenoComponent.getSecondTitle("温馨提示"));
+        div.add(p2);
+        Image img1 = new Image(ImageDataFactory.create(GenoReportBuilder.class.getClassLoader().getResource("image/drug/icon/cg.png")));
+        Image img2 = new Image(ImageDataFactory.create(GenoReportBuilder.class.getClassLoader().getResource("image/drug/icon/zq.png")));
+        Image img3 = new Image(ImageDataFactory.create(GenoReportBuilder.class.getClassLoader().getResource("image/drug/icon/js1.png")));
+        Image img4 = new Image(ImageDataFactory.create(GenoReportBuilder.class.getClassLoader().getResource("image/drug/icon/bm1.png")));
+        Paragraph p3 = new Paragraph();
+        p3.setFixedLeading(15);
+        p3.setFontSize(10f);
+        p3.add(img1.setHeight(8).setWidth(8).setMarginRight(2));
+        p3.add(new Text("常规使用").setFontColor(DrugColor.getThemeColor()));
+        p3.add(new Text("代表基因层面并无不适，可按临床常规方案用药；\n"));
+
+        p3.add(img2.setHeight(8).setWidth(8).setMarginRight(2));
+        p3.add(new Text("酌情使用").setFontColor(DrugColor.getYellowColor()));
+        p3.add(new Text("代表在使用该药物时有可能出现药效问题或不良反应，需要进行监控并做出相应调整；\n"));
+
+        p3.add(img3.setHeight(8).setWidth(8).setMarginRight(2));
+        p3.add(new Text("谨慎使用").setFontColor(DrugColor.getOrangeColor()));
+        p3.add(new Text("代表在使用该药物时需要通过调整用药剂量才能达到理想疗效或避免不良反应；\n"));
+
+        p3.add(img4.setHeight(8).setWidth(8).setMarginRight(2));
+        p3.add(new Text("避免使用").setFontColor(DrugColor.getRedColor()));
+        p3.add(new Text("代表在使用该药物时会出现严重不良反应或无效，建议更换药物。\n"));
+        div.add(p3);
+        div.add(new Paragraph("※注意：结果建议仅从基因角度出发，此外还需考虑受检者的临床实际和过敏史，因此切勿私自调药，具体方案需咨询专业医生或药剂师。"));
+        doc.add(div);
+
+        Painting painting = new Painting(pdf, font);
+        painting.drawHeader();
+        painting.close();
+
+        // 加个详细检测结果页
+        doc.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
+        Image image88 = new Image(ImageDataFactory.create(GenoReportBuilder.class.getClassLoader().getResource("image/drug/详细检测结果.png")));
+        image88.setMargins(-50, -60, -60, -60);
+        doc.add(image88);
+        return this;
     }
 
     @Override
     public IReportBuilder addContext() {
+        List<String> cateArr = new ArrayList<>();
+        cateArr.add("4");
+        cateArr.add("3A");
+        cateArr.add("3B");
+        cateArr.add("3C");
+        java.util.List<ReportBean.ItemsBean> gaoLevel = new LinkedList<>();
+        java.util.Set<ReportBean.CategoriesBean> normalLecel = new LinkedHashSet<>();
+        java.util.List<ReportBean.CategoriesBean> categories = reportBean.getCategories();
+        for (ReportBean.CategoriesBean category : categories) {
+            java.util.List<ReportBean.CategoriesBean.ItemsBean> items = category.getItems();
+            for (ReportBean.CategoriesBean.ItemsBean item : items) {
+                if (!item.getLocked()) {
+                    ReportBean.ItemsBean itemsBean = reportBean.getItems().get(item.getCode());
+                    if (cateArr.contains(item.getLevel())) {
+                        gaoLevel.add(itemsBean);
+                    } else {
+                        normalLecel.add(category);
+                    }
+                }
+            }
+        }
+
+        // 高危项目
+        for (ReportBean.ItemsBean itemsBean : gaoLevel) {
+            ExtraParam extraParam = new ExtraParam(ExtraParam.CatalogType.ATTENTION);
+            this.addBodyText(itemsBean, extraParam);
+        }
+
         return null;
+    }
+
+    /**
+     * 添加主体文本
+     *
+     * @param itemsBean
+     */
+    private void addBodyText(ReportBean.ItemsBean itemsBean, ExtraParam extraParam) {
+        float score = itemsBean.getScore();
+        String title = itemsBean.getCategoryName();
+
+        HeaderTextEvent headerTextEvent = new HeaderTextEvent(title, font);
+        pdf.addEventHandler(PdfDocumentEvent.START_PAGE, headerTextEvent);
+
+        doc.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
+
+        // 获取当前目录
+        CataLog cataLog = new CataLog(itemsBean.getIndex(), itemsBean.getCategoryName(), itemsBean.getName(), itemsBean.getLabel(), pdf.getNumberOfPages(), extraParam);
+        java.util.List<CataLog> cataLogs = this.cataLogsMap.getOrDefault(extraParam.getType(), new ArrayList<>());
+        cataLogs.add(cataLog);
+        this.cataLogsMap.put(extraParam.getType(), cataLogs);
+
+        // 检测结果正文
+        Paragraph p1 = new Paragraph();
+
+        PdfAction action = GenoComponent.getCatalogPageAction(pdf);
+        p1.add(new Link(itemsBean.getName(), action).addStyle(GenoStyle.getTitleStyle()));
+        p1.add(new Link(itemsBean.getEnName(), action).addStyle(GenoStyle.getThirdTitleStyle()));
+        Paragraph p2 = new Paragraph();
+        p2.add(GenoComponent.getSecondTitle("检测结果"));
+        doc.add(p1);
+
     }
 
     @Override

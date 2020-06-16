@@ -138,7 +138,7 @@ public class ReportBean {
              * analysisItems : 10
              * unlockedItems : 0
              */
-            private Integer categoryId;
+            private String categoryId;
             private String code;
             private String name;
             private String icon;
@@ -167,7 +167,7 @@ public class ReportBean {
          * analysisItems : 10
          * unlockedItems : 0
          */
-        private Integer categoryId;
+        private String categoryId;
         private String sampleCode;
         private String gender;
         private String code;
