@@ -161,9 +161,15 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <configuration>
+                <!--<configuration>
                     <mainClass>com.johnnian.App</mainClass>
                     <layout>ZIP</layout>
+                    <includes>
+                        <include>
+                            <groupId>nothing</groupId>
+                            <artifactId>nothing</artifactId>
+                        </include>
+                    </includes>
                 </configuration>
                 <executions>
                     <execution>
@@ -171,7 +177,7 @@
                             <goal>repackage</goal>
                         </goals>
                     </execution>
-                </executions>
+                </executions>-->
             </plugin>
         </plugins>
     </build>

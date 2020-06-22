@@ -36,6 +36,15 @@ public class DrugStyle {
         return style;
     }
 
+    public static Style getSecondSmallTitleStyle() {
+        Style style = new Style();
+        style.setFontSize(15);
+        style.setFontColor(GenoColor.getThemeColor());
+        style.setMarginLeft(5);
+        style.setBold();
+        return style;
+    }
+
     public static Style getThirdTitleStyle() {
         Style style = new Style();
         style.setFontSize(12);

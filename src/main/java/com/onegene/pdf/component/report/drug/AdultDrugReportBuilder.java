@@ -4,7 +4,6 @@ import cn.hutool.core.date.DateUtil;
 import com.itextpdf.io.image.ImageDataFactory;
 import com.itextpdf.kernel.colors.ColorConstants;
 import com.itextpdf.kernel.events.PdfDocumentEvent;
-import com.itextpdf.kernel.pdf.action.PdfAction;
 import com.itextpdf.layout.Style;
 import com.itextpdf.layout.borders.SolidBorder;
 import com.itextpdf.layout.element.*;
@@ -21,6 +20,7 @@ import com.onegene.pdf.component.report.gene.GenoColor;
 import com.onegene.pdf.component.report.gene.GenoComponent;
 import com.onegene.pdf.component.report.gene.GenoReportBuilder;
 import com.onegene.pdf.component.report.gene.GenoStyle;
+import com.onegene.pdf.util.Precondition;
 
 import java.util.*;
 import java.util.List;
@@ -184,7 +184,7 @@ public class AdultDrugReportBuilder extends AbstractReportBuilder {
         doc.add(p1);
 
         Table t1 = new Table(2).useAllAvailableWidth();
-        t1.setMargins(30, -10, 20, 0);
+        t1.setMargins(30, -20, 20, 0);
         Image goodTipImage = new Image(ImageDataFactory.create(GenoReportBuilder.class.getClassLoader().getResource("image/drug/icon/bm.png")));
         t1.addCell(GenoComponent.getDefaultCell(2, 1).setWidth(65).setPaddingBottom(30).add(goodTipImage.addStyle(GenoStyle.getLargeIconStyle())));
         t1.addCell(GenoComponent.getDefaultCell().add(new Paragraph("需避免使用的药物").addStyle(DrugStyle.getThirdTitleStyle())));
@@ -208,6 +208,7 @@ public class AdultDrugReportBuilder extends AbstractReportBuilder {
                 text.addStyle(style);
                 element.add(text);
             }
+            tabDiv.add(element);
             t1.addCell(GenoComponent.getDefaultCell().add(tabDiv));
         }
         t1.startNewRow();
@@ -342,13 +343,24 @@ public class AdultDrugReportBuilder extends AbstractReportBuilder {
         // 检测结果正文
         Paragraph p1 = new Paragraph();
 
-        PdfAction action = GenoComponent.getCatalogPageAction(pdf);
-        p1.add(new Link(itemsBean.getName(), action).addStyle(GenoStyle.getTitleStyle()));
-        p1.add(new Link(itemsBean.getEnName(), action).addStyle(GenoStyle.getThirdTitleStyle()));
+        p1.add(new Text(itemsBean.getName()).addStyle(DrugStyle.getTitleStyle()));
+        p1.add(new Text(itemsBean.getEnName()).addStyle(DrugStyle.getSecondSmallTitleStyle()));
         Paragraph p2 = new Paragraph();
-        p2.add(GenoComponent.getSecondTitle("检测结果"));
+        p2.add(new Text("常用商品名:").setFontColor(DrugColor.getThemeColor()));
+        String commonName = null;
+        List<ReportBean.ItemsBean.ContentsBean> contents = itemsBean.getContents();
+        for (ReportBean.ItemsBean.ContentsBean content : contents) {
+            if ("常见名称".equals(content.getLabel())) {
+                commonName = content.getValue().replaceAll("\\*", "、");
+            }
+        }
+        Precondition.checkNotNull(commonName, "常见名称为空");
+        p2.add(new Text(""+commonName));
+        Paragraph p3 = new Paragraph();
+        p3.add(GenoComponent.getSecondTitle("检测结果"));
         doc.add(p1);
-
+        doc.add(p2);
+        doc.add(p3);
     }
 
     @Override

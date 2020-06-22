@@ -23,9 +23,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * @author: laoliangliang
@@ -48,6 +46,7 @@ public abstract class AbstractReportBuilder implements IReportBuilder {
     protected ConverterProperties proper;
     protected Map<ExtraParam.CatalogType, java.util.List<CataLog>> cataLogsMap = new LinkedHashMap<>();
     protected Properties properties = new Properties();
+    protected Set<Integer> pageSet = new HashSet<>();
 
     public void setPrintReportBean(PrintReportBean printReportBean) {
         this.reportBean = printReportBean;

@@ -98,14 +98,14 @@ public class Painting {
         }
         // 画三角形
         pdfCanvas.setFillColor(color);
-        pdfCanvas.moveTo(pageSize.getWidth() / 2 + posXOffset, yOffset - 193)
-                .lineTo(pageSize.getWidth() / 2 - 3.4 + posXOffset, yOffset - 187)
-                .lineTo(pageSize.getWidth() / 2 + 3.4 + posXOffset, yOffset - 187)
+        pdfCanvas.moveTo(pageSize.getWidth() / 2 + posXOffset, yOffset - 192)
+                .lineTo(pageSize.getWidth() / 2 - 3.6 + posXOffset, yOffset - 185)
+                .lineTo(pageSize.getWidth() / 2 + 3.6 + posXOffset, yOffset - 185)
                 .fill();
         // 画圆
-        pdfCanvas.setLineWidth(2);
+        pdfCanvas.setLineWidth(2.4f);
         pdfCanvas.setStrokeColor(color);
-        pdfCanvas.roundRectangle(pageSize.getWidth() / 2 - 3 + posXOffset, yOffset - 188, 6, 6, 3)
+        pdfCanvas.roundRectangle(pageSize.getWidth() / 2 - 3.5 + posXOffset, yOffset - 186, 7, 7, 3.5)
                 .stroke();
         // 画进度条
         pdfCanvas
@@ -188,13 +188,13 @@ public class Painting {
         // 画三角形
         pdfCanvas.setFillColor(color);
         pdfCanvas.moveTo(pageSize.getWidth() / 2 + posXOffset, yOffset - 193)
-                .lineTo(pageSize.getWidth() / 2 - 3.4 + posXOffset, yOffset - 187)
-                .lineTo(pageSize.getWidth() / 2 + 3.4 + posXOffset, yOffset - 187)
+                .lineTo(pageSize.getWidth() / 2 - 6 + posXOffset, yOffset - 184)
+                .lineTo(pageSize.getWidth() / 2 + 6 + posXOffset, yOffset - 184)
                 .fill();
         // 画圆
-        pdfCanvas.setLineWidth(2);
+        pdfCanvas.setLineWidth(4);
         pdfCanvas.setStrokeColor(color);
-        pdfCanvas.roundRectangle(pageSize.getWidth() / 2 - 3 + posXOffset, yOffset - 188, 6, 6, 3)
+        pdfCanvas.roundRectangle(pageSize.getWidth() / 2 - 4.5 + posXOffset, yOffset - 186, 9, 9, 4.5)
                 .stroke();
 
         float textHeightOff = -215;

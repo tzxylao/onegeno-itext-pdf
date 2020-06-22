@@ -11,7 +11,6 @@ import com.itextpdf.kernel.geom.PageSize;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfReader;
 import com.itextpdf.kernel.pdf.PdfWriter;
-import com.itextpdf.kernel.pdf.action.PdfAction;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.Style;
 import com.itextpdf.layout.borders.SolidBorder;
@@ -230,7 +229,7 @@ public class GenoReportBuilder extends AbstractReportBuilder {
         p1.add(new Text("项检测项目"));
 
         Table t1 = new Table(2).useAllAvailableWidth();
-        t1.setMargins(30, -10, 20, 0);
+        t1.setMargins(30, -20, 20, 0);
         Image goodTipImage = new Image(ImageDataFactory.create(GenoReportBuilder.class.getClassLoader().getResource("image/gene/goodtip.png")));
         t1.addCell(GenoComponent.getDefaultCell(2, 1).setWidth(65).setPaddingBottom(30).add(goodTipImage.addStyle(GenoStyle.getLargeIconStyle())));
         t1.addCell(GenoComponent.getDefaultCell().add(new Paragraph("优势标签").addStyle(GenoStyle.getThirdTitleStyle())));
@@ -254,6 +253,7 @@ public class GenoReportBuilder extends AbstractReportBuilder {
                 text.addStyle(style);
                 element.add(text);
             }
+            tabDiv.add(element);
             t1.addCell(GenoComponent.getDefaultCell().add(tabDiv));
         }
         t1.startNewRow();
@@ -345,6 +345,7 @@ public class GenoReportBuilder extends AbstractReportBuilder {
                 continue;
             }
             doc.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
+            pageSet.add(pdf.getNumberOfPages());
             URL resource = GenoReportBuilder.class.getClassLoader().getResource("image/gene/" + categoriesBean.getCode() + ".png");
             Image backgroundImage = new Image(ImageDataFactory.create(resource));
             doc.add(backgroundImage);
@@ -390,8 +391,7 @@ public class GenoReportBuilder extends AbstractReportBuilder {
         // 检测结果正文
         Paragraph p1 = new Paragraph();
 
-        PdfAction action = GenoComponent.getCatalogPageAction(pdf);
-        p1.add(new Link(itemsBean.getName() + "\n", action).addStyle(GenoStyle.getTitleStyle()));
+        p1.add(new Text(itemsBean.getName() + "\n").addStyle(GenoStyle.getTitleStyle()));
         p1.add(GenoComponent.getSecondTitle("检测结果"));
         doc.add(p1);
 
@@ -665,14 +665,14 @@ public class GenoReportBuilder extends AbstractReportBuilder {
         personImage.scale(0.25f, 0.25f);
         personImage.setHorizontalAlignment(HorizontalAlignment.CENTER);
         doc.add(personImage);
-        boolean which = !"jfss".equals(categoryCode) && "gxtz".equals(categoryCode);
+        boolean which = !"jfss".equals(categoryCode) && !"gxtz".equals(categoryCode);
         if (which) {
             Paragraph element = new Paragraph("您的" + itemsBean.getName());
             element.setTextAlignment(TextAlignment.CENTER);
             element.add(new Text(itemsBean.getLabel()).setFontColor(colors[itemsBean.getIndex()]));
             doc.add(element);
         }
-        which = "gxtz".equals(categoryCode) || "jfss".equals(categoryCode);
+        which = "gxtz".equals(categoryCode) || "jfss".equals(categoryCode) ;
         if (which) {
             Paragraph element = new Paragraph();
             element.setTextAlignment(TextAlignment.CENTER);
@@ -852,6 +852,9 @@ public class GenoReportBuilder extends AbstractReportBuilder {
 
             if (pageNumber > 6 + catalogSize && pageNumber != 8 + catalogSize) {
                 if (forbidPage != null && (pageNumber - catalogSize) >= Integer.parseInt(forbidPage)) {
+                    continue;
+                }
+                if (pageSet.contains(pageNumber - catalogSize)) {
                     continue;
                 }
                 PageSize pageSize = pdf.getDefaultPageSize();
